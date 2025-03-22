@@ -1,89 +1,205 @@
-# Configuración del Script Automático con Entorno Virtual para OLED en Raspberry Pi
+Guía Completa
+Requisitos previos
 
-Este documento explica cómo configurar un script en Raspberry Pi para ejecutar automáticamente un programa de pantalla OLED utilizando un entorno virtual de Python cada vez que la Raspberry Pi se reinicie o se inicie.
-Requisitos Previos
+ Hardware:
 
-    Raspberry Pi con sistema operativo Linux (Raspberry Pi OS).
+Raspberry Pi (o cualquier dispositivo compatible con Linux).
 
-    Python 3 instalado.
+Pantalla OLED compatible con I2C (por ejemplo, SSD1306).
 
-    Entorno virtual de Python (creado previamente).
+Conexiones I2C correctamente cableadas (SDA, SCL, GND, VCC).
 
-    Paquetes necesarios instalados (como Adafruit-SSD1306).
+Software:
 
-## Paso 1: Crear un Script de Ejecución
-###1.1 Crear el archivo run_oled.sh
+Sistema operativo basado en Linux (por ejemplo, Raspberry Pi OS).
 
-Este script activará el entorno virtual y ejecutará el script de la pantalla OLED.
+Python 3 instalado.
 
-    nano /home/daniel/Documents/run_oled.sh
+Biblioteca luma.oled para controlar la pantalla OLED.
 
-Contenido del archivo run_oled.sh:
+Biblioteca psutil para obtener el uso de la CPU.
 
-    #!/bin/bash
-    source /home/daniel/Documents/oled_env/bin/activate  # Activar entorno virtual
-    python3 /home/daniel/Documents/codigo.py  # Ejecutar el script
+Paso 1: Configurar el entorno virtual
+Navegar al directorio del proyecto:
 
-### 1.2 Dar permisos de ejecución
 
-Una vez creado el archivo, es necesario darle permisos para que pueda ejecutarse:
+    cd /home/daniel/Documents
 
-    chmod +x /home/daniel/Documents/run_oled.sh
+Crear el entorno virtual:
 
-## Paso 2: Crear el Servicio systemd
-### 2.1 Crear el archivo del servicio
+    python3 -m venv oled_env
 
-Este servicio se configurará para ejecutar el script run_oled.sh cada vez que la Raspberry Pi inicie.
+Activar el entorno virtual:
+
+    source oled_env/bin/activate
+Después de activar el entorno virtual, verás (oled_env) en la terminal.
+
+Paso 2: Instalar dependencias
+Instalar las bibliotecas necesarias:
+
+    pip install luma.oled psutil
+
+Generar el archivo requirements.txt:
+
+    pip freeze > requirements.txt
+
+Este archivo contiene todas las dependencias instaladas y facilita su instalación en el futuro.
+
+Paso 3: Crear el script codigo.py
+Crear el archivo codigo.py:
+
+    nano /home/daniel/Documents/codigo.py
+
+Pegar el siguiente código:
+
+    python
+    Copy
+
+    from luma.oled.device import ssd1306
+    from luma.core.interface.serial import i2c
+    from luma.core.render import canvas
+    import time
+    import psutil
+    import socket
+
+    # Configuración del dispositivo OLED
+    serial = i2c(port=1, address=0x3C)
+    device = ssd1306(serial)
+
+    def get_ip_address(interface='eth0'):
+        """Obtiene la dirección IP de la interfaz especificada."""
+        try:
+            interfaces = psutil.net_if_addrs()
+            if interface in interfaces:
+                for addr in interfaces[interface]:
+                    if addr.family == socket.AF_INET:  # IPv4
+                        return addr.address
+            return "Sin IP"
+        except Exception as e:
+            return "Error IP"
+
+    def get_cpu_usage():
+        """Obtiene el porcentaje de uso de la CPU."""
+        return psutil.cpu_percent(interval=1)
+
+    try:
+        while True:
+            # Obtener la IP y el uso de la CPU
+            ip_address = get_ip_address('eth0')  # Cambia 'eth0' por 'wlan0' si usas Wi-Fi
+            cpu_usage = get_cpu_usage()
+
+            # Mostrar la información en la pantalla OLED
+            with canvas(device) as draw:
+                draw.text((0, 0), f"IP: {ip_address}", fill="white")
+                draw.text((0, 20), f"CPU: {cpu_usage}%", fill="white")
+
+            # Esperar 2 segundos antes de la siguiente actualización
+            time.sleep(2)
+    except KeyboardInterrupt:
+        print("Script detenido manualmente.")
+    except Exception as e:
+        print(f"Error: {e}")
+
+Guardar y cerrar el archivo:
+
+- Presiona Ctrl + O para guardar.
+- Presiona Ctrl + X para salir.
+
+Paso 4: Crear el archivo de servicio systemd
+Crear el archivo de servicio:
 
     sudo nano /etc/systemd/system/run_oled.service
 
-Contenido del archivo run_oled.service:
+Pegar el siguiente contenido:
+
 
     [Unit]
-    Description=OLED script in virtualenv
-    After=network.target  # Asegura que el script se ejecute después de que la red esté disponible
-    
+    Description=OLED script to display CPU and IP
+    After=network.target
+
     [Service]
-    ExecStart=/home/daniel/Documents/run_oled.sh  # Ruta al script de ejecución
-    WorkingDirectory=/home/daniel/Documents  # Directorio de trabajo
-    User=daniel  # Usuario para ejecutar el script
-    Group=daniel  # Grupo asociado
-    Restart=always  # Asegura que el servicio se reinicie si se detiene
-    
+    Type=simple
+    ExecStart=/home/daniel/Documents/oled_env/bin/python /home/daniel/Documents/codigo.py
+    WorkingDirectory=/home/daniel/Documents
+    User=daniel
+    Group=daniel
+    Restart=on-failure
+    RestartSec=3
+
     [Install]
-    WantedBy=multi-user.target  # El servicio se inicia con el sistema
+    WantedBy=multi-user.target
 
-### 2.2 Recargar systemd y habilitar el servicio
+Guardar y cerrar el archivo:
+- Presiona Ctrl + O para guardar.
+- Presiona Ctrl + X para salir.
 
-Una vez creado el archivo del servicio, recarga systemd para que reconozca el nuevo servicio y habilítalo para que se inicie automáticamente.
+Paso 5: Habilitar y ejecutar el servicio
+Recargar systemd para aplicar los cambios:
 
-    sudo systemctl daemon-reload  # Recargar los servicios
-    sudo systemctl enable run_oled.service  # Habilitar el servicio
+    sudo systemctl daemon-reload
 
-### 2.3 Iniciar el servicio
+Habilitar el servicio para que se inicie automáticamente al arrancar:
 
-Para probar si todo está funcionando correctamente, inicia el servicio manualmente.
+    sudo systemctl enable run_oled.service
+Iniciar el servicio manualmente:
 
     sudo systemctl start run_oled.service
 
-## Paso 3: Verificación y Reinicio
-### 3.1 Verificar la ejecución
-
-Para comprobar que el servicio se está ejecutando correctamente, puedes revisar el estado del servicio con:
+Verificar el estado del servicio:
 
     sudo systemctl status run_oled.service
 
-### 3.2 Reiniciar la Raspberry Pi
+Si todo está bien, deberías ver active (running).
 
-Para asegurarte de que todo funcione correctamente después de un reinicio, reinicia la Raspberry Pi:
+Paso 6: Solución de problemas
+1. La pantalla OLED no muestra nada
+Verifica las conexiones I2C:
 
-    sudo reboot
+Asegúrate de que los cables estén bien conectados (SDA, SCL, GND, VCC).
 
-El script debería ejecutarse automáticamente cada vez que se reinicie o encienda la Raspberry Pi.
-Notas
+Usa i2cdetect para confirmar que la pantalla está conectada:
 
-    Entorno Virtual: El script se ejecutará dentro de un entorno virtual de Python para evitar conflictos de dependencias o versiones de paquetes del sistema.
+        sudo i2cdetect -y 1
 
-    Servicio systemd: Este servicio se configura para que se ejecute en el inicio del sistema y reinicie automáticamente si falla.
+Deberías ver la dirección 0x3C (o 0x3D, dependiendo de la pantalla).
 
-    Paquetes Python: Asegúrate de tener todos los paquetes necesarios instalados dentro del entorno virtual para que el script funcione correctamente (como Adafruit-SSD1306).
+Verifica el voltaje:
+Asegúrate de que la pantalla esté conectada a 3.3V, no a 5V.
+
+2. El servicio no se inicia
+
+        sudo journalctl -u run_oled.service
+ Busca mensajes de error que indiquen qué está fallando.
+
+Verifica las rutas:
+
+- Asegúrate de que las rutas en ExecStart y WorkingDirectory sean correctas.
+
+3. La dirección IP es incorrecta
+
+Cambia la interfaz de red:
+Si usas Wi-Fi, cambia eth0 por wlan0 en el script:
+
+        ip_address = get_ip_address('wlan0')
+
+4. La pantalla parpadea
+
+    Reduce la frecuencia de actualización:
+
+        Aumenta el tiempo de espera en el bucle principal:
+        python
+        Copy
+
+        time.sleep(5)  # Cambia 5 por el número de segundos que desees.
+
+Resumen
+
+- Configura el entorno virtual e instala las dependencias.
+- Crea el script codigo.py para mostrar la IP y el uso de la CPU en la pantalla OLED.
+
+- Configura el servicio systemd para ejecuta
+- r el script automáticamente al iniciar el sistema.
+
+    Habilita y verifica el servicio.
+
+    Soluciona problemas comunes si es necesario.
