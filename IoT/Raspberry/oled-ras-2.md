@@ -1,27 +1,21 @@
-Guía Completa
-Requisitos previos
+# Guía oled rasperry-2 
+## Requisitos previos
 
- Hardware:
+### Hardware:
 
-Raspberry Pi (o cualquier dispositivo compatible con Linux).
-
-Pantalla OLED compatible con I2C (por ejemplo, SSD1306).
-
-Conexiones I2C correctamente cableadas (SDA, SCL, GND, VCC).
+- Raspberry Pi (o cualquier dispositivo compatible con Linux).
+- Pantalla OLED compatible con I2C (por ejemplo, SSD1306).
+- Conexiones I2C correctamente cableadas (SDA, SCL, GND, VCC).
 
 Software:
 
-Sistema operativo basado en Linux (por ejemplo, Raspberry Pi OS).
+- Sistema operativo basado en Linux (por ejemplo, Raspberry Pi OS).
+- Python 3 instalado.
+- Biblioteca luma.oled para controlar la pantalla OLED.
+- Biblioteca psutil para obtener el uso de la CPU.
 
-Python 3 instalado.
-
-Biblioteca luma.oled para controlar la pantalla OLED.
-
-Biblioteca psutil para obtener el uso de la CPU.
-
-Paso 1: Configurar el entorno virtual
+## Paso 1: Configurar el entorno virtual
 Navegar al directorio del proyecto:
-
 
     cd /home/daniel/Documents
 
@@ -34,7 +28,7 @@ Activar el entorno virtual:
     source oled_env/bin/activate
 Después de activar el entorno virtual, verás (oled_env) en la terminal.
 
-Paso 2: Instalar dependencias
+## Paso 2: Instalar dependencias
 Instalar las bibliotecas necesarias:
 
     pip install luma.oled psutil
@@ -45,7 +39,7 @@ Generar el archivo requirements.txt:
 
 Este archivo contiene todas las dependencias instaladas y facilita su instalación en el futuro.
 
-Paso 3: Crear el script codigo.py
+## Paso 3: Crear el script codigo.py
 Crear el archivo codigo.py:
 
     nano /home/daniel/Documents/codigo.py
@@ -105,7 +99,7 @@ Guardar y cerrar el archivo:
 - Presiona Ctrl + O para guardar.
 - Presiona Ctrl + X para salir.
 
-Paso 4: Crear el archivo de servicio systemd
+## Paso 4: Crear el archivo de servicio systemd
 Crear el archivo de servicio:
 
     sudo nano /etc/systemd/system/run_oled.service
