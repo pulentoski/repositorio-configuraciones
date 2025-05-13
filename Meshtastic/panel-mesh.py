@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-import serial
 import subprocess
 import meshtastic
 import meshtastic.serial_interface
 from datetime import datetime
 import time
 import logging
+from pubsub import pub
 
-# Configuración de logging
+# Configuración del logger
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -17,10 +17,6 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger()
-
-# Configuración
-SERIAL_PORT = "/dev/ttyUSB0"  # Cambiar si es necesario
-CHANNEL_NAME = "LongFast"     # Usar canal por defecto
 
 def execute_command(command):
     """Ejecuta comandos en el sistema con manejo de errores"""
@@ -37,55 +33,41 @@ def execute_command(command):
     except subprocess.CalledProcessError as e:
         return f"❌ {datetime.now().strftime('%H:%M:%S')}:\n{e.stderr[:200]}"
 
+def on_receive(packet, interface):
+    """Maneja mensajes entrantes manteniendo conectividad inalámbrica"""
+    try:
+        if 'decoded' in packet and packet['decoded']['portnum'] == 'TEXT_MESSAGE_APP':
+            message = packet['decoded']['text']
+            if message.startswith("cmd:"):
+                logger.info(f"Comando recibido: {message}")
+                response = execute_command(message[4:])
+                interface.sendText(response)
+    except Exception as e:
+        logger.error(f"Error procesando mensaje: {str(e)}")
+
 def main():
     interface = None
     try:
-        # Inicializa conexión según documentación oficial
-        logger.info(f"Conectando a {SERIAL_PORT}...")
-        interface = meshtastic.serial_interface.SerialInterface(devPath=SERIAL_PORT)
+        logger.info("Iniciando conexión Meshtastic...")
         
-        # Obtiene información del nodo local
-        our_node = interface.getNode('^local')
-        logger.info(f"Configuración del nodo:\n{our_node.localConfig}")
+        # Conexión que mantiene funcionalidad inalámbrica
+        interface = meshtastic.serial_interface.SerialInterface(
+            devPath="/dev/ttyUSB0",
+            noProto=False  # ← Permite operación paralela de radio y serial
+        )
         
-        logger.info(f"\nEscuchando comandos en canal {CHANNEL_NAME}...")
-        logger.info("Formato: cmd:tu_comando (ej: cmd:ls -la)")
-        logger.info("!reset para reiniciar dispositivo\n")
+        # Configura el handler de mensajes
+        pub.subscribe(on_receive, "meshtastic.receive")
+        
+        logger.info(f"\nConfiguración del nodo:\n{interface.nodes}\n")
+        logger.info("Sistema listo. Envía comandos con formato: cmd:tu_comando")
 
-        # Configuración del puerto serial directamente
-        ser = interface.stream
-
+        # Mantiene el script activo
         while True:
-            try:
-                # Verifica si hay datos disponibles
-                if ser.in_waiting > 0:
-                    msg = ser.readline().decode().strip()
-                    
-                    if msg.startswith("cmd:"):
-                        command = msg[4:]
-                        logger.info(f"Ejecutando: {command}")
-                        response = execute_command(command)
-                        interface.sendText(response)
-                        logger.info("Respuesta enviada al mesh")
-                    
-                    elif msg == "!reset":
-                        logger.info("Reiniciando dispositivo...")
-                        interface.sendText("Reiniciando...")
-                        time.sleep(2)
-                        interface.close()
-                        time.sleep(10)  # Espera a que se reinicie
-                        interface = meshtastic.serial_interface.SerialInterface(devPath=SERIAL_PORT)
-                        ser = interface.stream
-                        
-            except KeyboardInterrupt:
-                logger.info("Deteniendo por solicitud del usuario...")
-                break
-            except Exception as e:
-                logger.error(f"Error en bucle principal: {str(e)}")
-                time.sleep(5)
+            time.sleep(1)
 
     except Exception as e:
-        logger.error(f"Error inicial: {str(e)}")
+        logger.error(f"Error: {str(e)}")
     finally:
         if interface:
             interface.close()
