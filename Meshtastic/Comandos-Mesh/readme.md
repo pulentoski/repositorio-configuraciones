@@ -14,7 +14,9 @@ Entorno virtual
     pip install luma.oled psutil meshtastic pillow
 
 
+script que interpreta comandos:
 
+    nano /etc/systemd/system/oled_mqtt.service
 
 Crear servicio systemd:
 
