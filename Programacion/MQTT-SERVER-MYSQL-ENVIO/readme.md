@@ -1,3 +1,5 @@
+# Script para iniciar servidor mqtt y enviar datos a MYSQL
+
 ## Inicia entorno virtual:
     python3 -m venv mqtt_env
     source mqtt_env/bin/activate
