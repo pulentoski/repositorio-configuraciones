@@ -15,6 +15,11 @@ Ejemplo:
 
 Se crea un directorio /home/nombre_usuario y se asignan configuraciones básicas.
 
+### Asignar shell al crear un usuario:
+
+    useradd -m -s /bin/bash nombre_usuario  # Asigna bash
+    useradd -m -s /bin/sh nombre_usuario    # Asigna shell básico
+
 ## 1.2. Eliminar un usuario
 
     sudo deluser nombre_usuario
