@@ -98,11 +98,4 @@ Edita el script y personaliza la función `on_receive` para filtrar o validar lo
 
 ---
 
-## Créditos
 
-- Script adaptado por [tuusuario](https://github.com/tuusuario)
-- Basado en la librería oficial [meshtastic](https://pypi.org/project/meshtastic/)
-
----
-
-¿Dudas? ¡Abre un issue o colabora!
