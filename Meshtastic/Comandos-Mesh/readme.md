@@ -27,8 +27,8 @@ cd meshtastic-control
 ### 2. Crear y activar un entorno virtual
 
 ```bash
-python3 -m venv oled_env
-source oled_env/bin/activate
+python3 -m venv meshtastic_env
+source meshtastic_env/bin/activate
 ```
 
 ### 3. Actualizar pip y herramientas
