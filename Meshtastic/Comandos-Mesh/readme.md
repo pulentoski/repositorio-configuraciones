@@ -17,27 +17,27 @@ Este repositorio contiene un script en Python para controlar un nodo Meshtastic 
 
 ## Instalación y Primeros Pasos
 
-### 1. Clonar el repositorio
+### 1. Clona el repositorio
 
 ```bash
 git clone https://github.com/tuusuario/meshtastic-control.git
 cd meshtastic-control
 ```
 
-### 2. Crear y activar un entorno virtual
+### 2. Crea y activa un entorno virtual
 
 ```bash
 python3 -m venv meshtastic_env
 source meshtastic_env/bin/activate
 ```
 
-### 3. Actualizar pip y herramientas
+### 3. Actualiza pip y herramientas
 
 ```bash
 pip install --upgrade pip setuptools wheel
 ```
 
-### 4. Instalar dependencias
+### 4. Instala dependencias
 
 ```bash
 pip install meshtastic pyserial pypubsub
@@ -97,5 +97,3 @@ El resultado del comando aparecerá como respuesta por la red Meshtastic.
 Edita el script y personaliza la función `on_receive` para filtrar o validar los comandos recibidos.
 
 ---
-
-
