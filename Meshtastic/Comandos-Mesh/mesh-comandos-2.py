@@ -7,6 +7,7 @@ from datetime import datetime
 import time
 import logging
 from pubsub import pub
+import serial
 
 # Configuración del logger
 logging.basicConfig(
@@ -20,14 +21,28 @@ logging.basicConfig(
 logger = logging.getLogger()
 
 def buscar_puerto_serial():
-    """Busca un puerto serial válido"""
+    """Busca un puerto serial válido y retorna el primero que esté libre"""
     posibles_puertos = glob.glob('/dev/ttyACM*') + glob.glob('/dev/ttyUSB*')
+    for puerto in posibles_puertos:
+        if not puerto_ocupado(puerto):
+            logger.info(f"Puerto detectado: {puerto}")
+            return puerto
+        else:
+            logger.warning(f"⚠️ Puerto {puerto} está ocupado.")
     if posibles_puertos:
-        logger.info(f"Puerto detectado: {posibles_puertos[0]}")
-        return posibles_puertos[0]
+        logger.error("Todos los puertos detectados están en uso. Finaliza los procesos que los ocupan antes de continuar.")
     else:
         logger.error("⚠️ No se detectaron dispositivos Meshtastic conectados (ttyUSB* o ttyACM*)")
-        return None
+    return None
+
+def puerto_ocupado(puerto):
+    """Devuelve True si el puerto está ocupado, False si está libre"""
+    try:
+        s = serial.Serial(puerto)
+        s.close()
+        return False
+    except serial.SerialException:
+        return True
 
 def execute_command(command):
     """Ejecuta comandos en el sistema con manejo de errores"""
@@ -61,7 +76,8 @@ def main():
     puerto = buscar_puerto_serial()
     
     if not puerto:
-        return  # Sale si no hay puerto disponible
+        logger.error("No hay puertos disponibles para conectar. Saliendo...")
+        return  # Sale si no hay puerto disponible o si está ocupado
 
     try:
         logger.info(f"Iniciando conexión Meshtastic en {puerto}...")
