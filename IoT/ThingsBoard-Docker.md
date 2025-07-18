@@ -1,116 +1,136 @@
-# ThingsBoard CE en Raspberry Pi con Docker
+# ThingsBoard + Docker: Instalación profesional
 
-Instalación y despliegue de ThingsBoard Community Edition (`v3.6.4`) en una Raspberry Pi (ARM64) usando Docker y Docker Compose.
-
----
-
-## ✅ Requisitos
-
-- Raspberry Pi 3 o superior (64-bit, con Debian Bookworm o compatible)
-- Docker y Docker Compose instalados
-- Acceso a red local o Internet
-- 1 GB de RAM mínimo (recomendado 2 GB)
+Guía técnica y resumida para instalar ThingsBoard usando Docker en **Raspberry Pi** o **Ubuntu**.
 
 ---
 
-## ⚙️ Instalación paso a paso
+## 🧰 Requisitos
 
-### 1. Clonar repositorio oficial
+- Sistema operativo: Raspberry Pi OS 64-bit (Bookworm) o Ubuntu 20.04+.
+- Docker y Docker Compose instalados.
+- Acceso como root o usuario con `sudo`.
+
+---
+
+## ⚙️ Instalación de Docker (si no está instalado)
+
+```bash
+sudo apt update
+sudo apt install -y docker.io docker-compose
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+---
+
+## 🚀 Clonar el repositorio oficial de ThingsBoard
 
 ```bash
 git clone https://github.com/thingsboard/thingsboard.git
 cd thingsboard/docker
 ```
 
-### 2. Crear archivo `.env` personalizado (opcional)
+---
+
+## ⚙️ Crear archivo `.env` personalizado (opcional)
 
 Puedes definir el token, puerto y parámetros si deseas modificar la configuración. Por defecto, el sistema usa:
 
-- HTTP: `8080 → 9090`
-- MQTT: `1883`
-- COAP: `5683`
+- HTTP: 8080 → 9090
+- MQTT: 1883
+- COAP: 5683
 
-### 3. Iniciar contenedores
+### ✍️ Ejemplo de `.env`
 
-```bash
-docker compose -f docker-compose.yml up -d
+```env
+# Puertos
+HTTP_PORT=8080
+MQTT_PORT=1883
+COAP_PORT=5683
+LWM2M_PORT=5685
+SNMP_PORT=162
+
+# Usuario administrador de ThingsBoard
+TB_ADMIN_USER=admin@thingsboard.org
+TB_ADMIN_PASSWORD=admin
+
+# Configuración de demo
+DEMO=true
+DEMO_TOKEN=hQwQ8OSYXufnWW2LGekf
+
+# Base de datos PostgreSQL
+POSTGRES_DB=thingsboard
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_HOST=tb-postgres
+POSTGRES_PORT=5432
+
+# Volúmenes de datos
+DATA_DIR=./data
+LOGS_DIR=./logs
+
 ```
 
-Esto iniciará:
+Guarda este archivo en `thingsboard/docker/.env`.
 
-- `tb-postgres` (base de datos PostgreSQL)
-- `thingsboard` (servidor principal)
+---
 
-> El sistema se desplegará en `http://<IP_RASPBERRY>:8080`
-
-### 4. Verifica contenedores activos
+## 🧱 Iniciar ThingsBoard
 
 ```bash
-docker ps
-```
-
-Debe mostrar ambos contenedores corriendo (`STATUS: Up`).
-
----
-
-## 🔑 Acceso
-
-Por defecto:
-
-- URL: `http://192.168.x.x:8080`
-- Usuario admin: `tenant@thingsboard.org`
-- Contraseña: `tenant`
-
----
-
-## 🛠️ Errores comunes y soluciones
-
-| Problema                                         | Solución                                                                 |
-|--------------------------------------------------|--------------------------------------------------------------------------|
-| `ERR_CONNECTION_REFUSED`                         | Verifica que el contenedor esté en `Up`, que el puerto `8080` esté abierto |
-| `docker logs thingsboard` no muestra errores     | Asegúrate que el puerto `9090` esté asignado correctamente al host (`8080`) |
-| No carga interfaz web                            | Espera 2-3 minutos tras primer inicio; ThingsBoard tarda en levantar     |
-| PostgreSQL error `already running`               | Otro contenedor ya usa `5432`. Reinicia con `docker compose restart`     |
-| No se puede editar config (sin `nano`, `vi`)     | Usa `cat`, `echo` o instala con `apt update && apt install nano -y` dentro del contenedor |
-
----
-
-## ▶️ Arranque manual
-
-Si detienes la Raspberry Pi o apagas Docker:
-
-```bash
-cd ~/thingsboard/docker
 docker compose up -d
 ```
 
+Accede vía navegador a:
+
+```text
+http://<TU_IP_LOCAL>:8080
+```
+
+Usuario por defecto:
+
+- **admin@thingsboard.org**
+- **admin**
+
 ---
 
-## 🧹 Parar y eliminar contenedores
+## 🛠️ Ver logs y verificar estado
 
 ```bash
-docker compose down
+docker ps
+docker logs -f thingsboard
 ```
 
 ---
 
-## 📁 Archivos importantes
+## ❗ Problemas comunes
 
-| Archivo                         | Descripción                        |
-|---------------------------------|------------------------------------|
-| `docker-compose.yml`            | Define los servicios de Docker     |
-| `thingsboard.yml`               | Configuración principal del servidor ThingsBoard |
-| `docker/.env` (opcional)        | Variables de entorno del despliegue |
-
----
-
-## 📝 Recursos adicionales
-
-- [ThingsBoard Docs](https://thingsboard.io/docs/)
-- [Community Forum](https://groups.google.com/g/thingsboard)
+| Error                              | Solución                                                                 |
+|-----------------------------------|--------------------------------------------------------------------------|
+| `ERR_CONNECTION_REFUSED`          | Verifica que el contenedor esté corriendo: `docker ps`                   |
+| `ModuleNotFoundError` en Python   | Usa entorno virtual o instala con: `pip install --break-system-packages` |
+| No carga en el navegador          | Espera 2-3 min tras `docker-compose up`, o revisa logs                   |
 
 ---
 
-**Autor:** Tu nombre  
-**Repositorio:** https://github.com/tuusuario/tu-repo  
-**Licencia:** MIT
+## 🧼 Parar o reiniciar
+
+```bash
+docker compose down        # Detiene y elimina contenedores
+docker compose restart     # Reinicia contenedores
+```
+
+---
+
+## 📦 Desinstalación
+
+```bash
+docker compose down -v     # Borra contenedores y volúmenes
+```
+
+---
+
+## 🧪 Probado en
+
+- Raspberry Pi 3 / 4 (aarch64)
+- Ubuntu 22.04 LTS
