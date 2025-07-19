@@ -80,6 +80,11 @@ Guarda este archivo en `thingsboard/docker/.env`.
 ```bash
 docker compose up -d
 ```
+Si no usas docker compose sino docker-compose (con guion), prueba esto:
+```bash
+
+docker-compose up -d
+```
 
 Accede vía navegador a:
 
