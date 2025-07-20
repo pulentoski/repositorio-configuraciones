@@ -19,7 +19,7 @@ const char* mqtt_server = "192.168.0.16";  // IP del servidor ThingsBoard
 const int mqtt_port = 1883;
 const char* access_token = "6NNhaFPFqaW4HG5VbXWU";
 
-const int ledPin = 2;  // Cambia si usas otro pin
+const int ledPin = 2;  // LED integrado en NodeMCU = GPIO2
 bool ledState = false;
 
 WiFiClient espClient;
@@ -39,18 +39,20 @@ String extractRequestId(const char* topic) {
   return t.substring(lastSlash + 1);
 }
 
-void sendTelemetry() {
+void sendTelemetryAndAttributes() {
   String payload = "{\"led\":";
   payload += (ledState ? "true" : "false");
   payload += "}";
+
   client.publish("v1/devices/me/telemetry", payload.c_str());
-  Serial.println("Telemetría enviada: " + payload);
+  client.publish("v1/devices/me/attributes", payload.c_str());  // ← importante para el widget LED Indicator
+  Serial.println("Enviado a ThingsBoard: " + payload);
 }
 
 void setLed(bool state) {
   ledState = state;
-  digitalWrite(ledPin, ledState ? LOW : HIGH);  // LED activo en bajo
-  sendTelemetry();
+  digitalWrite(ledPin, ledState ? LOW : HIGH);  // LOW = encendido para LED interno
+  sendTelemetryAndAttributes();
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
@@ -66,6 +68,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
 
   const char* method = doc["method"];
+
   if (method && strcmp(method, "setLED") == 0) {
     bool param = doc["params"];
     setLed(param);
@@ -74,6 +77,17 @@ void callback(char* topic, byte* payload, unsigned int length) {
     String responseTopic = "v1/devices/me/rpc/response/" + requestId;
     client.publish(responseTopic.c_str(), param ? "true" : "false");
     Serial.println("Respuesta RPC enviada.");
+    return;
+  }
+
+  if (method && strcmp(method, "checkStatus") == 0) {
+    bool status = ledState;
+    String requestId = extractRequestId(topic);
+    String responseTopic = "v1/devices/me/rpc/response/" + requestId;
+    String response = status ? "true" : "false";
+    client.publish(responseTopic.c_str(), response.c_str());
+    Serial.println("Estado del LED reportado al widget.");
+    return;
   }
 }
 
@@ -83,7 +97,7 @@ void reconnect() {
     if (client.connect("ESPClient", access_token, NULL)) {
       Serial.println("Conectado.");
       client.subscribe("v1/devices/me/rpc/request/+");
-      sendTelemetry();
+      sendTelemetryAndAttributes();  // ← para que ThingsBoard sepa el estado tras reconexión
     } else {
       Serial.print("Fallo. Código: ");
       Serial.print(client.state());
@@ -107,6 +121,13 @@ void handleOff() {
   setLed(false);
   server.sendHeader("Location", "/");
   server.send(303);
+}
+
+void handleStatus() {
+  String status = "{\"led\":";
+  status += (ledState ? "true" : "false");
+  status += "}";
+  server.send(200, "application/json", status);
 }
 
 String getHTML() {
@@ -176,7 +197,7 @@ String getHTML() {
 <body>
   <div class="card">
     <h1>Control de LED</h1>
-    <div class="status">Estado: )====" + stateText + R"====(</div>
+    <div class="status" id="ledStatus">Estado: )====" + stateText + R"====(</div>
     <form action="/on" method="POST">
       <button class="btn on">ENCENDER</button>
     </form>
@@ -184,6 +205,24 @@ String getHTML() {
       <button class="btn off">APAGAR</button>
     </form>
   </div>
+
+  <script>
+    function updateStatus() {
+      fetch('/status')
+        .then(response => response.json())
+        .then(data => {
+          const statusDiv = document.getElementById('ledStatus');
+          if (data.led) {
+            statusDiv.textContent = 'Estado: ENCENDIDO';
+            statusDiv.style.backgroundColor = '#4CAF50';
+          } else {
+            statusDiv.textContent = 'Estado: APAGADO';
+            statusDiv.style.backgroundColor = '#f44336';
+          }
+        });
+    }
+    setInterval(updateStatus, 2000);
+  </script>
 </body>
 </html>
 )====";
@@ -195,7 +234,7 @@ String getHTML() {
 void setup() {
   Serial.begin(115200);
   pinMode(ledPin, OUTPUT);
-  digitalWrite(ledPin, HIGH);  // Inicialmente apagado
+  digitalWrite(ledPin, HIGH);  // LED apagado al inicio
 
   WiFi.begin(ssid, password);
   Serial.print("Conectando a WiFi");
@@ -211,6 +250,7 @@ void setup() {
   server.on("/", HTTP_GET, handleRoot);
   server.on("/on", HTTP_POST, handleOn);
   server.on("/off", HTTP_POST, handleOff);
+  server.on("/status", HTTP_GET, handleStatus);
   server.begin();
 }
 
