@@ -1,0 +1,269 @@
+#include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+#include <DHT.h>
+#include <ESP8266HTTPClient.h>
+
+// Configuración Hardware
+#define DHTPIN D4
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE);
+const int MQ2_A0_PIN = A0;
+const int MQ2_D0_PIN = D3;
+
+// Configuración WiFi
+const char* ssid = "IOT SUB-ESTACION";
+const char* password = "12345678";
+
+// Configuración ThingsBoard
+const char* THINGSBOARD_TOKEN = "bPW0nEPL2RfSMfIsvBFb";
+const char* THINGSBOARD_SERVER = "10.193.137.185";
+
+// Variables Globales
+ESP8266WebServer server(80);
+float temperature = 0;
+float humidity = 0;
+int gasValue = 0;
+bool gasAlert = false;
+bool dhtError = false;
+bool mq2Error = false;
+const unsigned long UPDATE_INTERVAL = 3000; // 3 segundos
+
+// Plantilla HTML en PROGMEM
+const char HTML_TEMPLATE[] PROGMEM = R"=====(
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitor IoT Profesional</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 20px;
+      color: #2c3e50;
+    }
+    .dashboard {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .header {
+      background: #2c3e50;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .sensor-container {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 20px;
+      gap: 15px;
+    }
+    .sensor-card {
+      flex: 1;
+      min-width: 200px;
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border-left: 4px solid #3498db;
+    }
+    .sensor-card.alert {
+      border-left-color: #e74c3c;
+      animation: pulse 1.5s infinite;
+    }
+    .sensor-value {
+      font-size: 24px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    .sensor-meta {
+      color: #7f8c8d;
+      font-size: 14px;
+    }
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.7; }
+      100% { opacity: 1; }
+    }
+    .timestamp {
+      text-align: center;
+      padding: 10px;
+      color: #95a5a6;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <div class="header">
+      <h1>Monitor Industrial</h1>
+      <p>Sistema de Monitoreo en Tiempo Real</p>
+    </div>
+    
+    <div class="sensor-container">
+      <div class="sensor-card" id="temp-card">
+        <h3>🌡️ Temperatura</h3>
+        <div class="sensor-value" id="temp">--</div>
+        <div class="sensor-meta">DHT11 | <span id="temp-status">OK</span></div>
+      </div>
+      
+      <div class="sensor-card" id="hum-card">
+        <h3>💧 Humedad</h3>
+        <div class="sensor-value" id="hum">--</div>
+        <div class="sensor-meta">DHT11 | <span id="hum-status">OK</span></div>
+      </div>
+      
+      <div class="sensor-card" id="gas-card">
+        <h3>⚠️ Gas</h3>
+        <div class="sensor-value" id="gas">--</div>
+        <div class="sensor-meta">MQ-2 | <span id="gas-status">Normal</span></div>
+      </div>
+    </div>
+    
+    <div class="timestamp" id="timestamp">
+      Actualizando datos...
+    </div>
+  </div>
+
+  <script>
+    function updateData() {
+      fetch('/data')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('temp').textContent = 
+            !isNaN(data.temperature) ? data.temperature.toFixed(1) + '°C' : 'Error';
+          document.getElementById('hum').textContent = 
+            !isNaN(data.humidity) ? data.humidity.toFixed(1) + '%' : 'Error';
+          document.getElementById('gas').textContent = data.gas || '--';
+          
+          document.getElementById('temp-status').textContent = 
+            data.dhtError ? 'Error' : 'OK';
+          document.getElementById('hum-status').textContent = 
+            data.dhtError ? 'Error' : 'OK';
+          document.getElementById('gas-status').textContent = 
+            data.mq2Error ? 'Error' : (data.gasAlert ? 'ALERTA!' : 'Normal');
+            
+          const gasCard = document.getElementById('gas-card');
+          gasCard.className = data.gasAlert ? 'sensor-card alert' : 'sensor-card';
+            
+          document.getElementById('timestamp').textContent = 
+            'Última actualización: ' + new Date().toLocaleTimeString();
+        });
+    }
+    
+    setInterval(updateData, 3000); // Actualización cada 3 segundos
+    updateData();
+  </script>
+</body>
+</html>
+)=====";
+
+void setup() {
+  Serial.begin(115200);
+  initHardware();
+  connectWiFi();
+  initWebServer();
+}
+
+void loop() {
+  server.handleClient();
+  readSensors();
+  
+  if (WiFi.status() == WL_CONNECTED) {
+    sendToThingsBoard();
+  }
+  delay(UPDATE_INTERVAL); // Usa el intervalo de 3 segundos
+}
+
+void initHardware() {
+  dht.begin();
+  pinMode(MQ2_A0_PIN, INPUT);
+  pinMode(MQ2_D0_PIN, INPUT);
+}
+
+void connectWiFi() {
+  Serial.print("\nConectando a WiFi...");
+  WiFi.begin(ssid, password);
+  
+  unsigned long startTime = millis();
+  while (WiFi.status() != WL_CONNECTED && millis() - startTime < 10000) {
+    delay(500);
+    Serial.print(".");
+  }
+  
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("\nConectado! IP: " + WiFi.localIP().toString());
+  } else {
+    Serial.println("\nError: No se pudo conectar al WiFi");
+  }
+}
+
+void initWebServer() {
+  server.on("/", handleRoot);
+  server.on("/data", handleData);
+  server.begin();
+  Serial.println("Servidor HTTP iniciado");
+}
+
+void readSensors() {
+  // Lectura DHT11
+  float t = dht.readTemperature();
+  float h = dht.readHumidity();
+  
+  temperature = isnan(t) ? NAN : t;
+  humidity = isnan(h) ? NAN : h;
+  dhtError = isnan(t) || isnan(h);
+
+  // Lectura MQ-2
+  gasValue = analogRead(MQ2_A0_PIN);
+  int digitalValue = digitalRead(MQ2_D0_PIN);
+  gasAlert = (digitalValue == HIGH);
+  mq2Error = (digitalValue != HIGH && digitalValue != LOW);
+
+  Serial.print("Temp: "); Serial.print(temperature);
+  Serial.print("°C, Hum: "); Serial.print(humidity);
+  Serial.print("%, Gas: "); Serial.print(gasValue);
+  Serial.print(", Alerta: "); Serial.println(gasAlert ? "ACTIVA" : "inactiva");
+}
+
+void sendToThingsBoard() {
+  WiFiClient client;
+  HTTPClient http;
+  
+  String url = "http://" + String(THINGSBOARD_SERVER) + ":8080/api/v1/" + THINGSBOARD_TOKEN + "/telemetry";
+  http.begin(client, url);
+  http.addHeader("Content-Type", "application/json");
+
+  String payload = "{\"temperature\":" + String(temperature) + 
+                  ",\"humidity\":" + String(humidity) + 
+                  ",\"gas\":" + String(gasValue) + 
+                  ",\"gasAlert\":" + String(gasAlert ? "true" : "false") + 
+                  ",\"dhtError\":" + String(dhtError ? "true" : "false") + 
+                  ",\"mq2Error\":" + String(mq2Error ? "true" : "false") + "}";
+
+  int httpCode = http.POST(payload);
+  Serial.print("HTTP Code: ");
+  Serial.println(httpCode);
+  http.end();
+}
+
+void handleRoot() {
+  String html = FPSTR(HTML_TEMPLATE);
+  server.send(200, "text/html", html);
+}
+
+void handleData() {
+  String json = "{\"temperature\":" + String(temperature) + 
+                ",\"humidity\":" + String(humidity) + 
+                ",\"gas\":" + String(gasValue) + 
+                ",\"gasAlert\":" + String(gasAlert ? "true" : "false") + 
+                ",\"dhtError\":" + String(dhtError ? "true" : "false") + 
+                ",\"mq2Error\":" + String(mq2Error ? "true" : "false") + "}";
+  server.send(200, "application/json", json);
+}
