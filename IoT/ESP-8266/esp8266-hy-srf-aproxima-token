@@ -1,12 +1,13 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
+#include <ESP8266HTTPClient.h>  // Para ThingsBoard
 
 // Configuración WiFi
 const char* ssid = "IOT SUB-ESTACION";
 const char* password = "12345678";
 ESP8266WebServer server(80);
 
-// Pines (ajusta según tu conexión física)
+// Pines
 const int trigPin = 5;     // D1
 const int echoPin = 4;     // D2
 const int relayPin = 0;    // D3
@@ -14,14 +15,18 @@ const int redLedPin = 14;  // D5
 const int whiteLedPin = 12;// D6
 
 // Variables
-int safeDistance = 50;     // Distancia umbral en cm
+int safeDistance = 50;     // Umbral en cm
 int distance = 0;
-bool systemActive = true;  // Para control manual
+bool systemActive = true;  // Control manual
+
+// Datos ThingsBoard
+const char* THINGSBOARD_TOKEN = "rlMQTSLfUQHUJrhzYkqK";
+const char* THINGSBOARD_SERVER = "10.193.137.185";
 
 void setup() {
   Serial.begin(115200);
   
-  // Configura pines
+  // Pines
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
   pinMode(relayPin, OUTPUT);
@@ -39,7 +44,7 @@ void setup() {
   }
   Serial.println("\nConectado! IP: " + WiFi.localIP().toString());
 
-  // Rutas del servidor web
+  // Servidor web
   server.on("/", handleRoot);
   server.on("/data", handleData);
   server.on("/toggle", HTTP_POST, handleToggle);
@@ -51,7 +56,8 @@ void loop() {
   server.handleClient();
   medirDistancia();
   controlarSalidas();
-  delay(500);
+  enviarDatosThingsBoard(distance);  // Enviar a ThingsBoard
+  delay(1000);
 }
 
 void medirDistancia() {
@@ -84,7 +90,29 @@ void controlarSalidas() {
   }
 }
 
-// Página web principal
+void enviarDatosThingsBoard(int distancia) {
+  if (WiFi.status() == WL_CONNECTED) {
+    WiFiClient client;
+    HTTPClient http;
+    String url = "http://" + String(THINGSBOARD_SERVER) + ":8080/api/v1/" + String(THINGSBOARD_TOKEN) + "/telemetry";
+    http.begin(client, url);  // Versión compatible con nueva librería
+    http.addHeader("Content-Type", "application/json");
+
+    String payload = "{\"distance\":" + String(distancia) + "}";
+    int httpCode = http.POST(payload);
+
+    Serial.print("Enviado a ThingsBoard: ");
+    Serial.println(payload);
+    Serial.print("Código HTTP: ");
+    Serial.println(httpCode);
+
+    http.end();
+  } else {
+    Serial.println("WiFi no conectado, no se puede enviar a ThingsBoard.");
+  }
+}
+
+// Página web
 void handleRoot() {
   String html = F(
     "<!DOCTYPE html><html><head>"
@@ -126,7 +154,7 @@ void handleRoot() {
   server.send(200, "text/html", html);
 }
 
-// Datos en JSON para AJAX
+// Datos en JSON para la web
 void handleData() {
   String status = (distance <= safeDistance && distance > 0) ? "OBJETO DETECTADO 🔴" : "ZONA DESPEJADA 🟢";
   bool alert = (distance <= safeDistance && distance > 0);
@@ -140,7 +168,7 @@ void handleData() {
   server.send(200, "application/json", json);
 }
 
-// Control manual del sistema
+// Activar / desactivar sistema
 void handleToggle() {
   if (server.arg("action") == "activate") {
     systemActive = true;
