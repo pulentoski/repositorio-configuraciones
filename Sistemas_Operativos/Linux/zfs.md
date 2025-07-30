@@ -41,6 +41,9 @@ Tolerancia a 2 discos fallidos.
        zpool create mi_pool raidz3 /dev/sdb /dev/sdc /dev/sdd /dev/sde /dev/sdf /dev/sdg
 Tolerancia a 3 discos fallidos.
    
+## Crear el dataset (paso final de configuración)
+    zfs create pool-ruz/datos
+______________________________________________________________________________
 
 
 ## 4. Capacidad Útil según Configuración
