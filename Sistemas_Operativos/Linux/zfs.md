@@ -45,15 +45,15 @@ Tolerancia a 3 discos fallidos.
     zfs create pool-ruz/datos
 ______________________________________________________________________________
 
+# ZFS vs RAID Tradicional
 
-## 4. Capacidad Útil según Configuración
-Tipo | Discos mín. | Capacidad útil | Tolerancia a fallos
------------|-------------|---------------------|----------------------
-Striped | 1 | 100% | 0 discos
-Mirror | 2 | 50% | N - 1 discos
-RAID-Z1 | 3 | N - 1 discos | 1 disco
-RAID-Z2 | 4 | N - 2 discos | 2 discos
-RAID-Z3 | 5 | N - 3 discos | 3 discos
+| Tipo ZFS  | Equivalente RAID       | Discos Mínimos | Capacidad Útil        | Tolerancia a Fallos |
+|-----------|------------------------|----------------|-----------------------|---------------------|
+| Striped   | RAID 0                 | 1              | 100%                  | 0 discos            |
+| Mirror    | RAID 1                 | 2              | 50% (o 1/N si N > 2)  | N-1 discos          |
+| RAID-Z1   | RAID 5                 | 3              | N-1 discos            | 1 disco             |
+| RAID-Z2   | RAID 6                 | 4              | N-2 discos            | 2 discos            |
+| RAID-Z3   | RAID 7 (no estándar)   | 5              | N-3 discos            | 3 discos            |
 
 ## 5. Verificación y Uso de Pools
 - Ver pool: zpool status
