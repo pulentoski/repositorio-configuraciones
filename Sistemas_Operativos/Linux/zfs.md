@@ -1,9 +1,27 @@
-# Guía : ZFS y RAID en Linux
+# Guía : ZFS y RAID en Linux, Instalación de ZFS en AlmaLinux
 
 ## 1. Introducción a ZFS
-
 ZFS (Zettabyte File System) es un sistema de archivos moderno que combina gestión de volúmenes y
 archivos. Proporciona alta integridad de datos, tolerancia a fallos y escalabilidad.
+Este documento explica los pasos necesarios para instalar ZFS en AlmaLinux.
+
+## Prerrequisitos
+
+- AlmaLinux instalado y actualizado
+- Acceso de root o capacidad de usar `sudo`
+- Conexión a internet activa
+
+## Pasos de instalación
+
+### 1. Preparación del sistema
+
+Ejecuta los siguientes comandos en orden:
+
+    dnf install https://zfsonlinux.org/epel/zfs-release-2-3$(rpm --eval "%{dist}").noarch.rpm
+    dnf install epel-release
+    dnf install kernel-devel
+
+
 
 ## 2. Lógica de Discos, RAID y RAID-Z
 RAID (Redundant Array of Independent Disks) permite combinar discos para redundancia o rendimiento.
