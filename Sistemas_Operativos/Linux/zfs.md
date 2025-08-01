@@ -1,134 +1,205 @@
-# Guía : ZFS y RAID en Linux, Instalación de ZFS en AlmaLinux
+# Guía de Comandos: ZFS y RAID en Linux (AlmaLinux)
 
-## 1. Introducción a ZFS
-ZFS (Zettabyte File System) es un sistema de archivos moderno que combina gestión de volúmenes y
-archivos. Proporciona alta integridad de datos, tolerancia a fallos y escalabilidad.
-Este documento explica los pasos necesarios para instalar ZFS en AlmaLinux.
+## Introducción a ZFS
 
-## Prerrequisitos
+ZFS (Zettabyte File System) es un sistema de archivos avanzado que combina la funcionalidad de gestión de volúmenes y sistema de archivos en una sola solución. Está diseñado para ofrecer alta integridad de datos, tolerancia a fallos, escalabilidad masiva y administración simplificada.
 
-- AlmaLinux instalado y actualizado
-- Acceso de root o capacidad de usar `sudo`
-- Conexión a internet activa
+### Diferencia entre `zpool` y `zfs`
 
-## Pasos de instalación
+* **`zpool`**: Comando para administrar pools de almacenamiento físico. Permite crear, destruir, verificar, exportar e importar conjuntos de discos físicos configurados en RAID.
+* **`zfs`**: Comando para administrar datasets y volúmenes dentro de un pool ZFS. Permite crear sistemas de archivos, asignar cuotas, activar compresión, compartir por red, entre otros.
 
-### 1. Preparación del sistema
+---
 
-Ejecuta los siguientes comandos en orden:
+## 1. Instalación de ZFS en AlmaLinux
 
-    dnf install https://zfsonlinux.org/epel/zfs-release-2-3$(rpm --eval "%{dist}").noarch.rpm
-    dnf install epel-release
-    dnf install kernel-devel
+```bash
+dnf install https://zfsonlinux.org/epel/zfs-release-2-3$(rpm --eval "%{dist}").noarch.rpm
+dnf install epel-release
+dnf install kernel-devel
+dnf install zfs
+modprobe zfs
+```
 
+---
 
+## 2. Creación de Pools ZFS
 
-## 2. Lógica de Discos, RAID y RAID-Z
-RAID (Redundant Array of Independent Disks) permite combinar discos para redundancia o rendimiento.
-RAID-Z es la versión mejorada de ZFS que incluye verificación de datos y tolerancia avanzada a fallos.
+### RAID 0 (Striped Pool)
 
-# 3. Tipos de Pools en ZFS
-## A. Striped Pool (RAID 0)
- - Comando:
-   
-       zpool create mi_pool /dev/sdb /dev/sdc /dev/sdd
-Sin redundancia, mayor rendimiento.
+```bash
+zpool create mi_pool /dev/sdb /dev/sdc /dev/sdd
+```
 
-## B. Mirror Pool (RAID 1)
- - Comando:
+### RAID 1 (Mirror Pool)
 
- 
-       zpool create mi_pool mirror /dev/sdb /dev/sdc
-Redundancia total: un disco puede fallar.
+```bash
+zpool create mi_pool mirror /dev/sdb /dev/sdc
+```
 
-## C. RAID-Z1 (RAID 5)
- - Comando:
-   
-        zpool create mi_pool raidz /dev/sdb /dev/sdc /dev/sdd
-Tolerancia a 1 disco fallido.
-   
-## D. RAID-Z2 (RAID 6)
- - Comando:
+### RAID-Z1
 
-        zpool create mi_pool raidz2 /dev/sdb /dev/sdc /dev/sdd /dev/sde
-Tolerancia a 2 discos fallidos.
-   
-## E. RAID-Z3
- - Comando:
-   
-       zpool create mi_pool raidz3 /dev/sdb /dev/sdc /dev/sdd /dev/sde /dev/sdf /dev/sdg
-Tolerancia a 3 discos fallidos.
-   
-## Crear el dataset (paso final de configuración)
-    zfs create pool-ruz/datos
-______________________________________________________________________________
+```bash
+zpool create mi_pool raidz /dev/sdb /dev/sdc /dev/sdd
+```
 
-# ZFS vs RAID Tradicional
+### RAID-Z2
 
-| Tipo ZFS  | Equivalente RAID       | Discos Mínimos | Capacidad Útil        | Tolerancia a Fallos |
-|-----------|------------------------|----------------|-----------------------|---------------------|
-| Striped   | RAID 0                 | 1              | 100%                  | 0 discos            |
-| Mirror    | RAID 1                 | 2              | 50% (o 1/N si N > 2)  | N-1 discos          |
-| RAID-Z1   | RAID 5                 | 3              | N-1 discos            | 1 disco             |
-| RAID-Z2   | RAID 6                 | 4              | N-2 discos            | 2 discos            |
-| RAID-Z3   | RAID 7 (no estándar)   | 5              | N-3 discos            | 3 discos            |
+```bash
+zpool create mi_pool raidz2 /dev/sdb /dev/sdc /dev/sdd /dev/sde
+```
 
-## 5. Verificación y Uso de Pools
-- Ver pool: zpool status
-- Montaje automático en /<nombre_del_pool>
-- Crear archivo: echo 'Hola ZFS' > /<pool>/archivo.txt
+### RAID-Z3
 
-## 6. Problemas comunes
-Si los discos tienen firmas anteriores, límpialos con:
+```bash
+zpool create mi_pool raidz3 /dev/sdb /dev/sdc /dev/sdd /dev/sde /dev/sdf /dev/sdg
+```
+
+### Crear dataset
+
+```bash
+zfs create mi_pool/mis_datos
+```
+
+### Asignar cuota
+
+```bash
+zfs set quota=10G mi_pool/mis_datos
+```
+
+---
+
+## 3. Verificación y Administración de Pools
+
+### Ver estado del pool
+
+```bash
+zpool status
+zfs list
+```
+
+### Listar pools
+
+```bash
+zpool list
+```
+
+### Scrub (verificar integridad)
+
+```bash
+zpool scrub mi_pool
+```
+
+### Exportar e importar pools
+
+```bash
+zpool export mi_pool
+zpool import mi_pool
+```
+
+### Reemplazar disco dañado
+
+```bash
+zpool replace mi_pool /dev/sdX /dev/sdY
+```
+
+### Eliminar un pool (con precaución)
+
+```bash
+zpool destroy mi_pool
+```
+
+---
+
+## 4. Compartir Volúmenes ZFS por NFS (Servidor)
+
+### Opción A: Compartir automáticamente con ZFS
+
+```bash
+zfs set sharenfs=on data
+zfs set sharenfs=on softwares
+zfs set sharenfs=on usuarios
+```
+
+### Opción B: Configuración manual con `/etc/exports`
+
+```bash
+echo "/data *(rw,sync,no_subtree_check)" >> /etc/exports
+echo "/softwares *(rw,sync,no_subtree_check)" >> /etc/exports
+echo "/usuarios *(rw,sync,no_subtree_check)" >> /etc/exports
+systemctl restart nfs-server
+```
+
+---
+
+## 5. Configuración del Cliente NFS
+
+### Instalar cliente NFS
+
+```bash
+dnf install nfs-utils         # AlmaLinux / RHEL
+apt install nfs-common        # Debian / Ubuntu
+```
+
+### Crear puntos de montaje
+
+```bash
+mkdir -p /mnt/data /softwares /home
+```
+
+### Montar volúmenes compartidos
+
+```bash
+mount -t nfs <IP-del-servidor>:/data /mnt/data
+mount -t nfs <IP-del-servidor>:/softwares /softwares
+mount -t nfs <IP-del-servidor>:/usuarios /home
+```
+
+### Verificar montajes
+
+```bash
+df -h | grep nfs
+mount | grep nfs
+```
+
+### Montaje automático (opcional)
+
+```bash
+echo "<IP-del-servidor>:/data /mnt/data nfs defaults 0 0" >> /etc/fstab
+echo "<IP-del-servidor>:/softwares /softwares nfs defaults 0 0" >> /etc/fstab
+echo "<IP-del-servidor>:/usuarios /home nfs defaults 0 0" >> /etc/fstab
+```
+
+---
+
+## 6. Utilidades y Mantenimiento
+
+### Limpiar firmas anteriores de discos
+
+```bash
 wipefs -a /dev/sdX
+```
 
-## 7. Práctica en VirtualBox
-- Agrega discos desde la configuración de la VM.
-- Verifica con lsblk (ej: sdb, sdc, sdd).
-- Crea el pool: zpool create testpool raidz sdb sdc sdd
-- Prueba: cd /testpool && touch test.txt
+### Crear archivo de prueba en dataset
 
-# Administrar Pools ZFS
-## 1. Listar y Verificar
+```bash
+echo "Hola ZFS" > /data/archivo.txt
+```
 
-    zpool list                # Muestra todos los pools  
-    zpool status [pool]       # Estado detallado (discos, errores)  
+### Ver exportaciones disponibles (cliente)
 
- 
-## 2. Eliminar Pool ⚠️ (¡CUIDADO! Borra todo)
+```bash
+showmount -e <IP-del-servidor>
+```
 
-    zpool destroy [pool]      # Elimina pool y datos  
-    zpool destroy -f [pool]   # Fuerza eliminación si está en uso  
+---
 
-## 3. Exportar/Importar (para mover o recuperar pools)
+## 7. Tabla Comparativa: ZFS vs RAID Tradicional
 
-       zpool export [pool]       # Desmontar seguro  
-       zpool import [pool]       # Volver a montar  
-
-## 5. Reemplazar Disco Dañado
-
-       zpool replace [pool] [disco_viejo] [disco_nuevo]  
-       Ejemplo: zpool replace mi_pool /dev/sdb /dev/sdz
-
-## 6. Verificar Integridad (corrige errores)
-
-       zpool scrub [pool]  
-
-# 💡 Ejemplo Rápido: Reiniciar Configuración
-Borrar pool (si existe):
-
-    zpool destroy testpool  
-Crear nuevo pool RAID-Z1:
-
-    zpool create testpool raidz1 sdb sdc sdd  
-Verificar:
-
-    zpool status testpool  
-
-🔹 Tips Clave: 
-
-- Backup antes de destruir.
-
-- RAID-Z no permite añadir discos sueltos, solo nuevos grupos (ej: otro RAID-Z1).
-
-- Usa zfs para gestionar datasets (archivos/volúmenes dentro del pool).
+| Tipo ZFS | Equivalente RAID     | Discos Mínimos | Capacidad Útil       | Tolerancia a Fallos |
+| -------- | -------------------- | -------------- | -------------------- | ------------------- |
+| Striped  | RAID 0               | 1              | 100%                 | 0 discos            |
+| Mirror   | RAID 1               | 2              | 50% (o 1/N si N > 2) | N-1 discos          |
+| RAID-Z1  | RAID 5               | 3              | N-1 discos           | 1 disco             |
+| RAID-Z2  | RAID 6               | 4              | N-2 discos           | 2 discos            |
+| RAID-Z3  | RAID 7 (no estándar) | 5              | N-3 discos           | 3 discos            |
