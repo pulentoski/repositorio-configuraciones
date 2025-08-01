@@ -123,14 +123,42 @@ zfs set sharenfs=on usuarios
 
 ### Opción B: Configuración manual con `/etc/exports`
 
-```bash
-echo "/data *(rw,sync,no_subtree_check)" >> /etc/exports
-echo "/softwares *(rw,sync,no_subtree_check)" >> /etc/exports
-echo "/usuarios *(rw,sync,no_subtree_check)" >> /etc/exports
-systemctl restart nfs-server
-```
 
----
+Instalar NFS
+
+    dnf install nfs-utils
+
+# Configurar /etc/exports
+
+    echo "/archivos/data *(rw,sync,no_root_squash)" >> /etc/exports
+
+# Recargar configuración
+
+    exportfs -rav
+
+# Firewall: 
+
+    firewall-cmd --permanent --add-service=nfs
+    firewall-cmd --permanent --add-service=mountd
+    firewall-cmd --permanent --add-service=rpc-bind
+    firewall-cmd --reload
+
+
+
+## permisos: configuración del archivo /etc/exports (el archivo que controla qué carpetas se comparten por NFS y con qué permisos
+
+    /archivos/data *(rw,sync,no_root_squash)
+  
+- /archivos/data: Ruta de la carpeta que se está compartiendo. 
+
+- *: Permite que cualquier computadora en la red acceda (puedes restringirlo a una IP específica, ej: 192.168.1.0/24).
+
+- rw: Permiso de lectura y escritura (si fuera ro sería solo lectura).
+
+- sync: Sincroniza los cambios en disco de forma segura (evita corrupción de datos).
+
+- no_root_squash: Permite que el usuario root del cliente tenga privilegios de root en el servidor (¡Cuidado! Solo úsalo en redes confiables).
+
 
 ## 5. Configuración del Cliente NFS
 
