@@ -1,17 +1,28 @@
-# Guía de Comandos: ZFS y RAID en Linux (AlmaLinux)
+# 🌐 Guía de Administración ZFS y RAID en Linux (AlmaLinux)
 
-## Introducción a ZFS
+## 📘 Introducción
 
-ZFS (Zettabyte File System) es un sistema de archivos avanzado que combina la funcionalidad de gestión de volúmenes y sistema de archivos en una sola solución. Está diseñado para ofrecer alta integridad de datos, tolerancia a fallos, escalabilidad masiva y administración simplificada.
+**ZFS (Zettabyte File System)** es un sistema de archivos avanzado que combina la gestión de volúmenes y archivos en una única solución. Fue diseñado para:
 
-### Diferencia entre `zpool` y `zfs`
+- 💾 Alta **integridad de datos**
+- 🛡️ **Tolerancia a fallos**
+- 📈 **Escalabilidad masiva**
+- 🔧 Administración simple y eficiente
 
-* **`zpool`**: Comando para administrar pools de almacenamiento físico. Permite crear, destruir, verificar, exportar e importar conjuntos de discos físicos configurados en RAID.
-* **`zfs`**: Comando para administrar datasets y volúmenes dentro de un pool ZFS. Permite crear sistemas de archivos, asignar cuotas, activar compresión, compartir por red, entre otros.
+ZFS permite crear configuraciones tipo RAID llamadas **RAID-Z**, además de soportar funcionalidades como compresión, snapshots, cuotas, y más.
 
 ---
 
-## 1. Instalación de ZFS en AlmaLinux
+## 🔍 Diferencias entre `zpool` y `zfs`
+
+| 🛠️ Comando | 📌 Función                                                                 |
+|------------|----------------------------------------------------------------------------|
+| `zpool`    | Administra pools de almacenamiento físico (RAID-Z, Mirror, etc.)          |
+| `zfs`      | Administra datasets, cuotas, compresión, snapshots, y compartición de datos |
+
+---
+
+## 🚀 1. Instalación de ZFS en AlmaLinux
 
 ```bash
 dnf install https://zfsonlinux.org/epel/zfs-release-2-3$(rpm --eval "%{dist}").noarch.rpm
@@ -20,209 +31,162 @@ dnf install kernel-devel
 dnf install zfs
 modprobe zfs
 ```
-------------------------------------------------------------------------------------------------------------------------------------------
+
 ---
 
-## 2. Creación de Pools ZFS
+## 🧼 2. Preparar Discos (opcional)
 
-### RAID 0 (Striped Pool)
+```bash
+wipefs -a /dev/sdX
+```
+> 🔁 Limpia firmas anteriores para evitar conflictos al crear el pool.
+
+---
+
+## 🧱 3. Crear un Pool ZFS
+
+### ⚡ RAID 0 (Striped)
 
 ```bash
 zpool create mi_pool /dev/sdb /dev/sdc /dev/sdd
 ```
 
-### RAID 1 (Mirror Pool)
+### 🪞 RAID 1 (Mirror)
 
 ```bash
 zpool create mi_pool mirror /dev/sdb /dev/sdc
 ```
 
-### RAID-Z1
+### 🧩 RAID-Z1
 
 ```bash
 zpool create mi_pool raidz /dev/sdb /dev/sdc /dev/sdd
 ```
 
-### RAID-Z2
+### 🛡️ RAID-Z2
 
 ```bash
 zpool create mi_pool raidz2 /dev/sdb /dev/sdc /dev/sdd /dev/sde
 ```
 
-### RAID-Z3
+### 🛡️ RAID-Z3
 
 ```bash
 zpool create mi_pool raidz3 /dev/sdb /dev/sdc /dev/sdd /dev/sde /dev/sdf /dev/sdg
 ```
 
-### Crear dataset
+---
+
+## 📂 4. Crear y Configurar un Dataset
 
 ```bash
 zfs create mi_pool/mis_datos
-```
-
-### Asignar cuota
-
-```bash
 zfs set quota=10G mi_pool/mis_datos
 ```
+> 📁 Un dataset permite aplicar cuotas, compresión, snapshots, etc.
 
 ---
 
-
-## 3. Verificación y Administración de Pools
-
-### Ver estado del pool
-
-```bash
-zpool status
-zfs list
-```
-
-### Listar pools
+## 🔧 5. Administración del Pool
 
 ```bash
 zpool list
-```
-
-### Scrub (verificar integridad)
-
-```bash
+zpool status
+zfs list
 zpool scrub mi_pool
-```
-
-### Exportar e importar pools
-
-```bash
 zpool export mi_pool
 zpool import mi_pool
-```
-
-### Reemplazar disco dañado
-
-```bash
 zpool replace mi_pool /dev/sdX /dev/sdY
-```
-
-### Eliminar un pool (con precaución)
-
-```bash
-zpool destroy mi_pool
+zpool destroy mi_pool  # ⚠️ Usar con precaución
 ```
 
 ---
 
-## 4. Compartir Volúmenes ZFS por NFS (Servidor)
+## 🌐 6. Compartir Dataset por NFS (Servidor)
 
-### Opción A: Compartir automáticamente con ZFS
-
-```bash
-zfs set sharenfs=on data
-zfs set sharenfs=on softwares
-zfs set sharenfs=on usuarios
-```
-
-### Opción B: Configuración manual con `/etc/exports`
-
-
-Instalar NFS
-
-    dnf install nfs-utils
-
-# Configurar /etc/exports
-
-    echo "/archivos/data *(rw,sync,no_root_squash)" >> /etc/exports
-
-# Recargar configuración
-
-    exportfs -rav
-
-
-## Habilita y arranca el servidor NFS de una vez (sin necesidad de reiniciar).
-
-    systemctl enable --now nfs-server
-
---------------------------------------------------------------------------------------------------------------
-
-# Firewall: 
-
-    firewall-cmd --permanent --add-service=nfs
-    firewall-cmd --permanent --add-service=mountd
-    firewall-cmd --permanent --add-service=rpc-bind
-    firewall-cmd --reload
-
-
-
-## permisos: configuración del archivo /etc/exports (el archivo que controla qué carpetas se comparten por NFS y con qué permisos
-
-    /archivos/data *(rw,sync,no_root_squash)
-  
-- /archivos/data: Ruta de la carpeta que se está compartiendo. 
-
-- *: Permite que cualquier computadora en la red acceda (puedes restringirlo a una IP específica, ej: 192.168.1.0/24).
-
-- rw: Permiso de lectura y escritura (si fuera ro sería solo lectura).
-
-- sync: Sincroniza los cambios en disco de forma segura (evita corrupción de datos).
-
-- no_root_squash: Permite que el usuario root del cliente tenga privilegios de root en el servidor (¡Cuidado! Solo úsalo en redes confiables).
-
-
-## 5. Configuración del Cliente NFS
-
-### Instalar cliente NFS
+### ✅ A. Compartir directamente con ZFS
 
 ```bash
-dnf install nfs-utils         # AlmaLinux / RHEL
-apt install nfs-common        # Debian / Ubuntu
+zfs set sharenfs=on mi_pool/mis_datos
 ```
 
-### Crear puntos de montaje
+### 📝 B. Configuración manual
+
+1. Instalar NFS:
 
 ```bash
-mkdir -p /mnt/data /softwares /home
+dnf install nfs-utils
 ```
 
-### Montar volúmenes compartidos
+2. Editar `/etc/exports`:
 
 ```bash
-mount -t nfs <IP-del-servidor>:/data /mnt/data
-mount -t nfs <IP-del-servidor>:/softwares /softwares
-mount -t nfs <IP-del-servidor>:/usuarios /home
+echo "/mi_pool/mis_datos *(rw,sync,no_root_squash)" >> /etc/exports
 ```
 
-### Verificar montajes
+3. Activar servicio NFS:
+
+```bash
+exportfs -rav
+systemctl enable --now nfs-server
+```
+
+4. 🔥 Configurar firewall:
+
+```bash
+firewall-cmd --permanent --add-service=nfs
+firewall-cmd --permanent --add-service=mountd
+firewall-cmd --permanent --add-service=rpc-bind
+firewall-cmd --reload
+```
+
+---
+
+## 💻 7. Configurar Cliente NFS
+
+### 🧰 Instalar cliente NFS
+
+```bash
+dnf install nfs-utils       # AlmaLinux
+apt install nfs-common      # Debian/Ubuntu
+```
+
+### 📁 Crear punto de montaje
+
+```bash
+mkdir -p /mnt/mis_datos
+```
+
+### 🔗 Montar el recurso compartido
+
+```bash
+mount -t nfs <IP-del-servidor>:/mi_pool/mis_datos /mnt/mis_datos
+```
+
+### 🔍 Verificar montajes
 
 ```bash
 df -h | grep nfs
 mount | grep nfs
 ```
 
-### Montaje automático (opcional)
+### 🔒 Montaje persistente (opcional)
 
 ```bash
-echo "<IP-del-servidor>:/data /mnt/data nfs defaults 0 0" >> /etc/fstab
-echo "<IP-del-servidor>:/softwares /softwares nfs defaults 0 0" >> /etc/fstab
-echo "<IP-del-servidor>:/usuarios /home nfs defaults 0 0" >> /etc/fstab
+echo "<IP-del-servidor>:/mi_pool/mis_datos /mnt/mis_datos nfs defaults 0 0" >> /etc/fstab
 ```
 
 ---
 
-## 6. Utilidades y Mantenimiento
+## 🧪 8. Pruebas
 
-### Limpiar firmas anteriores de discos
-
-```bash
-wipefs -a /dev/sdX
-```
-
-### Crear archivo de prueba en dataset
+### 📄 Crear archivo de prueba
 
 ```bash
-echo "Hola ZFS" > /data/archivo.txt
+echo "Hola ZFS" > /mnt/mis_datos/archivo.txt
 ```
 
-### Ver exportaciones disponibles (cliente)
+### 📡 Ver exportaciones NFS disponibles
 
 ```bash
 showmount -e <IP-del-servidor>
@@ -230,12 +194,17 @@ showmount -e <IP-del-servidor>
 
 ---
 
-## 7. Tabla Comparativa: ZFS vs RAID Tradicional
+## 📊 9. Tabla Comparativa: ZFS vs RAID Tradicional
 
-| Tipo ZFS | Equivalente RAID     | Discos Mínimos | Capacidad Útil       | Tolerancia a Fallos |
-| -------- | -------------------- | -------------- | -------------------- | ------------------- |
-| Striped  | RAID 0               | 1              | 100%                 | 0 discos            |
-| Mirror   | RAID 1               | 2              | 50% (o 1/N si N > 2) | N-1 discos          |
-| RAID-Z1  | RAID 5               | 3              | N-1 discos           | 1 disco             |
-| RAID-Z2  | RAID 6               | 4              | N-2 discos           | 2 discos            |
-| RAID-Z3  | RAID 7 (no estándar) | 5              | N-3 discos           | 3 discos            |
+| ⚙️ Tipo ZFS | 🛠️ Equivalente RAID     | 🔢 Discos Mínimos | 📦 Capacidad Útil       | 🔁 Tolerancia a Fallos |
+|------------|--------------------------|-------------------|-------------------------|-------------------------|
+| Striped    | RAID 0                   | 1                 | 100%                    | 0 discos                |
+| Mirror     | RAID 1                   | 2                 | 50% (o 1/N si N > 2)    | N-1 discos              |
+| RAID-Z1    | RAID 5                   | 3                 | N-1 discos              | 1 disco                 |
+| RAID-Z2    | RAID 6                   | 4                 | N-2 discos              | 2 discos                |
+| RAID-Z3    | RAID 7 (no oficial)      | 5                 | N-3 discos              | 3 discos                |
+
+---
+
+
+---
