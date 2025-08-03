@@ -68,16 +68,7 @@ zfs set quota=10G mi_pool/mis_datos
 ```
 
 ---
-------------------------------------------------------------------------------------------------------------------------
 
-## Habilita y arranca el servidor NFS de una vez (sin necesidad de reiniciar).
-
-    systemctl enable --now nfs-server
-
-## Actualiza la lista de recursos compartidos NFS sin reiniciar servicios
-
-    exportfs -av
---------------------------------------------------------------------------------------------------------------
 
 ## 3. Verificación y Administración de Pools
 
@@ -145,6 +136,13 @@ Instalar NFS
 # Recargar configuración
 
     exportfs -rav
+
+
+## Habilita y arranca el servidor NFS de una vez (sin necesidad de reiniciar).
+
+    systemctl enable --now nfs-server
+
+--------------------------------------------------------------------------------------------------------------
 
 # Firewall: 
 
