@@ -20,7 +20,7 @@ dnf install kernel-devel
 dnf install zfs
 modprobe zfs
 ```
-
+------------------------------------------------------------------------------------------------------------------------------------------
 ---
 
 ## 2. Creación de Pools ZFS
@@ -68,6 +68,16 @@ zfs set quota=10G mi_pool/mis_datos
 ```
 
 ---
+------------------------------------------------------------------------------------------------------------------------
+
+## Habilita y arranca el servidor NFS de una vez (sin necesidad de reiniciar).
+
+    systemctl enable --now nfs-server
+
+## Actualiza la lista de recursos compartidos NFS sin reiniciar servicios
+
+    exportfs -av
+--------------------------------------------------------------------------------------------------------------
 
 ## 3. Verificación y Administración de Pools
 
