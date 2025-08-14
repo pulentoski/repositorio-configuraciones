@@ -18,10 +18,6 @@ Bloquea acceso 120s tras 3 intentos fallidos en 60s.
    
     login block-for 120 attempts 3 within 60
 
-Bloquea acceso 15s tras 5 intentos fallidos en 60s.
-   
-    login block-for 15 attempts 5 within 60
-
 Retraso de 10s entre intentos de login.
   
     login delay 10
