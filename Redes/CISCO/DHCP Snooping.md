@@ -19,6 +19,10 @@ configure terminal
 ! 2. Proteger VLANs
 
     ip dhcp snooping vlan [num]        ! Ejemplo: ip dhcp snooping vlan 10,20-30
+    
+Se desactiva para todo el switch, porque afecta cómo el switch inserta la Opción 82 en los paquetes DHCP.
+
+    Switch(config)# no ip dhcp snooping information option
 
 ! 3. Configurar puertos de confianza (trusted)
 
