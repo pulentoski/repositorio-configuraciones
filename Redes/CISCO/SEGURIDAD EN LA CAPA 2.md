@@ -1,7 +1,7 @@
 # RESUMEN TÉCNICO: SEGURIDAD EN LA CAPA 2
-# La Capa 2 (Enlace de Datos) es fundamental para la red. 
-# Si se ve comprometida, se afectan todas las capas superiores.
-# A continuación se detallan los ataques más comunes y las configuraciones de mitigación.
+La Capa 2 (Enlace de Datos) es fundamental para la red. 
+Si se ve comprometida, se afectan todas las capas superiores.
+## A continuación se detallan los ataques más comunes y las configuraciones de mitigación.
 
 # 1. PORT SECURITY
 # Protege los puertos del switch limitando las direcciones MAC permitidas.
