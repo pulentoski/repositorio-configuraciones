@@ -48,7 +48,7 @@ policy-map QOS-VOZ
 
 ---
 
-### 4. Aplicar la política en la interfaz WAN
+### 4. Aplicar la política en la interfaz LAN
 ```bash
 interface GigabitEthernet0/0
  description Enlace hacia Internet
