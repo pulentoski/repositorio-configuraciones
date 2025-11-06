@@ -12,7 +12,7 @@ device = ssd1306(serial)
 
 # Cargar una fuente más grande para el texto
 font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-font_size = 14  # Tamaño de fuente para el texto
+font_size = 10  # Tamaño de fuente para el texto
 font = ImageFont.truetype(font_path, font_size)
 
 # Cargar una fuente más grande para el emoticón (si es compatible)
