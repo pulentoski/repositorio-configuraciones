@@ -1,0 +1,244 @@
+/*
+  RFID Pentest Tool - Fixed detection and more robust classification
+  - ESP8266 (NodeMCU) + RC522
+  - Creates an Access Point and serves a hacker-style dashboard
+  - Detects tags, prints the raw type string and classifies if "clonable" (heuristic)
+  - IMPORTANT: This tool identifies potentially vulnerable card *types* (e.g. MIFARE Classic).
+    It does NOT perform cracking or cloning. Use only with your own cards or with explicit permission.
+*/
+
+#include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+#include <SPI.h>
+#include <MFRC522.h>
+
+// --- CONFIG ---
+const char* ap_ssid = "RFID-Pentest-Lab";
+const char* ap_password = "hack12345";
+
+#define RST_PIN D3    // NodeMCU D3 -> GPIO0
+#define SS_PIN  D4    // NodeMCU D4 -> GPIO2
+
+MFRC522 mfrc522(SS_PIN, RST_PIN);
+ESP8266WebServer server(80);
+
+// Data structure
+struct TagData {
+  String uid = "";
+  String type = "";
+  String rawType = "";
+  String timestamp = "";
+  bool isClonable = false;
+};
+TagData lastTag;
+int tagCount = 0;
+bool newDetection = false;
+bool apStarted = false;
+bool rfidPresent = true; // assume present; we'll log raw type to confirm
+
+// Simple HTML dashboard (same style as before, trimmed for clarity)
+const char* htmlPage = R"rawliteral(
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RFID Pentest Tool</title>
+<style>
+body{background:#0a0a0a;color:#00ff00;font-family:monospace;margin:0;padding:18px}
+.container{max-width:900px;margin:0 auto;border:1px solid #00ff00;padding:16px}
+.header{ text-align:center;margin-bottom:14px } .glitch{font-size:2em}
+.status {padding:10px;margin:8px 0;border-radius:6px}
+.ok{background:#00ff00;color:#000}
+.bad{background:#ff4444;color:#fff}
+.terminal{background:#000;border:1px solid #00ff00;padding:10px;height:200px;overflow:auto}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header"><div class="glitch">RFID PENTEST TOOL</div><div>ESP8266 + RC522 - Demo</div></div>
+  <div>AP: <strong>RFID-Pentest-Lab</strong> / Pass: <strong>hack12345</strong> - URL: http://192.168.4.1</div>
+  <div id="apstatus" class="status bad">AP: checking...</div>
+  <div id="rfidstatus" class="status bad">RC522: checking...</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0">
+    <div style="border:1px solid #00ff00;padding:8px"><b>TAGS</b><div id="tagcount">0</div></div>
+    <div style="border:1px solid #00ff00;padding:8px"><b>LAST</b><div id="lastseen">--:--:--</div></div>
+    <div style="border:1px solid #00ff00;padding:8px"><b>UID</b><div id="uid">---</div></div>
+  </div>
+  <div style="border:1px solid #00ff00;padding:10px;margin-bottom:10px">
+    <div><b>TYPE (raw):</b> <span id="rawtype">---</span></div>
+    <div><b>CLASSIFICATION:</b> <span id="classif">---</span></div>
+  </div>
+  <div class="terminal"><div id="log"></div></div>
+</div>
+<script>
+function update() {
+  fetch('/data').then(r=>r.json()).then(d=>{
+    document.getElementById('tagcount').textContent = d.tagCount;
+    document.getElementById('lastseen').textContent = d.lastSeen;
+    document.getElementById('uid').textContent = d.lastTag.uid || '---';
+    document.getElementById('rawtype').textContent = d.lastTag.rawType || '---';
+    document.getElementById('classif').textContent = d.lastTag.isClonable ? 'VULNERABLE - CLONABLE' : 'SEGURO';
+    let ap = document.getElementById('apstatus');
+    if (d.apActive) { ap.textContent='AP ACTIVO'; ap.className='status ok'; } else { ap.textContent='AP INACTIVO'; ap.className='status bad'; }
+    let rf = document.getElementById('rfidstatus');
+    if (d.rfidActive) { rf.textContent='RC522 OPERATIVO'; rf.className='status ok'; } else { rf.textContent='RC522 NO DETECTADO'; rf.className='status bad'; }
+    if (d.newDetection) {
+      const log=document.getElementById('log');
+      const e=document.createElement('div');
+      e.textContent=`[${d.lastTag.timestamp}] TAG: ${d.lastTag.uid} | ${d.lastTag.rawType} | ${d.lastTag.isClonable ? 'VULNERABLE' : 'SEGURO'}`;
+      log.appendChild(e);
+      log.scrollTop = log.scrollHeight;
+    }
+  }).catch(err=>console.error(err));
+}
+setInterval(update,1000);
+update();
+</script>
+</body>
+</html>
+)rawliteral";
+
+// ---------- Helpers ----------
+String formatUID(byte *uid, byte uidSize) {
+  String s = "";
+  for (byte i = 0; i < uidSize; i++) {
+    if (mfrc522.uid.uidByte[i] < 0x10) s += "0";
+    s += String(mfrc522.uid.uidByte[i], HEX);
+  }
+  s.toUpperCase();
+  s.toUpperCase();
+  s.toUpperCase(); // ensure uppercase (String::toUpperCase not always needed)
+  s.toUpperCase();
+  return s;
+}
+
+// Robust classification: accept many variants returned by PICC_GetTypeName()
+bool isTagClonableFromRawType(const String &rawType) {
+  String t = rawType;
+  t.toLowerCase();
+  // MIFARE Classic variants
+  if (t.indexOf("mifare classic") != -1) return true;
+  if (t.indexOf("mifare 1k") != -1) return true;
+  if (t.indexOf("mifare 1kb") != -1) return true;
+  if (t.indexOf("mifare 4k") != -1) return true;
+  if (t.indexOf("mifare ultralight") != -1) return true;
+  if (t.indexOf("ultralight") != -1) return true;
+  // LF legacy tags (heuristic; RC522 won't read LF but left for completeness)
+  if (t.indexOf("em4100") != -1 || t.indexOf("hid prox") != -1) return true;
+  // NTAG/NTAG2xx are often writable (mark as reviewable)
+  if (t.indexOf("ntag") != -1) return true;
+  // If it's a generic "MIFARE" with size mentions
+  if (t.indexOf("mifare") != -1 && (t.indexOf("1k") != -1 || t.indexOf("4k") != -1)) return true;
+
+  // Otherwise, consider not clonable with this simple kit (RC522 + ESP8266)
+  return false;
+}
+
+String getTimestamp() {
+  unsigned long s = millis() / 1000;
+  int h = (s % 86400L) / 3600;
+  int m = (s % 3600) / 60;
+  int sec = s % 60;
+  char buf[16];
+  sprintf(buf, "%02d:%02d:%02d", h, m, sec);
+  return String(buf);
+}
+
+// ---------- Web endpoints ----------
+void handleRoot() {
+  server.send(200, "text/html", htmlPage);
+}
+
+void handleData() {
+  String json = "{";
+  json += "\"apActive\":" + String(apStarted ? "true" : "false") + ",";
+  json += "\"rfidActive\":" + String(rfidPresent ? "true" : "false") + ",";
+  json += "\"tagCount\":" + String(tagCount) + ",";
+  json += "\"lastSeen\":\"" + lastTag.timestamp + "\",";
+  json += "\"newDetection\":" + String(newDetection ? "true" : "false") + ",";
+  json += "\"lastTag\":{";
+  json += "\"uid\":\"" + lastTag.uid + "\",";
+  json += "\"type\":\"" + lastTag.type + "\",";
+  json += "\"rawType\":\"" + lastTag.rawType + "\",";
+  json += "\"timestamp\":\"" + lastTag.timestamp + "\",";
+  json += "\"isClonable\":" + String(lastTag.isClonable ? "true" : "false");
+  json += "}}";
+  server.send(200, "application/json", json);
+  newDetection = false;
+}
+
+// ---------- Setup & Loop ----------
+void setup() {
+  Serial.begin(115200);
+  delay(200);
+  Serial.println();
+  Serial.println("=== RFID PENTEST TOOL - START ===");
+
+  // init SPI and RC522
+  SPI.begin();
+  mfrc522.PCD_Init();
+  Serial.println("MFRC522 init called. If you don't see a raw type when scanning, re-check wiring.");
+
+  // Start AP
+  WiFi.mode(WIFI_AP);
+  IPAddress local_IP(192, 168, 4, 1);
+  IPAddress gateway(192, 168, 4, 1);
+  IPAddress subnet(255, 255, 255, 0);
+  WiFi.softAPConfig(local_IP, gateway, subnet);
+
+  apStarted = WiFi.softAP(ap_ssid, ap_password);
+  if (apStarted) {
+    Serial.printf("AP started: %s  IP: %s\n", ap_ssid, WiFi.softAPIP().toString().c_str());
+  } else {
+    Serial.println("Failed to start AP!");
+  }
+
+  // Disable WiFi sleep to make AP more stable on some boards
+  WiFi.setSleepMode(WIFI_NONE_SLEEP);
+
+  // Web server routes
+  server.on("/", handleRoot);
+  server.on("/data", handleData);
+  server.begin();
+  Serial.println("HTTP server started on port 80");
+}
+
+void loop() {
+  server.handleClient();
+
+  // Periodic AP info
+  static unsigned long lastAPInfo = 0;
+  if (millis() - lastAPInfo > 10000) {
+    lastAPInfo = millis();
+    Serial.printf("AP clients: %u\n", WiFi.softAPgetStationNum());
+  }
+
+  // RFID check - only if a card is present
+  if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
+    // UID
+    String uid = formatUID(mfrc522.uid.uidByte, mfrc522.uid.size);
+    // Type
+    MFRC522::PICC_Type piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
+    String typeName = mfrc522.PICC_GetTypeName(piccType); // e.g. "MIFARE 1KB" or "MIFARE Classic"
+    // Save raw type and normalized type
+    lastTag.uid = uid;
+    lastTag.rawType = typeName;
+    // Some libraries return a short name; keep both raw and a normalized description
+    lastTag.type = typeName;
+    lastTag.timestamp = getTimestamp();
+    lastTag.isClonable = isTagClonableFromRawType(lastTag.rawType);
+    tagCount++;
+    newDetection = true;
+
+    Serial.println("----- TAG DETECTED -----");
+    Serial.printf("UID: %s\n", lastTag.uid.c_str());
+    Serial.printf("Raw type: %s\n", lastTag.rawType.c_str());
+    Serial.printf("Classified: %s\n", lastTag.isClonable ? "VULNERABLE" : "SEGURO");
+    Serial.println("------------------------");
+
+    // Stop communication with the card
+    mfrc522.PICC_HaltA();
+    // Halt PICC and stop encryption (good practice)
+    mfrc522.PCD_StopCrypto1();
+    delay(300); // short debounce
+  }
+}
