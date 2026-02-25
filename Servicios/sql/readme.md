@@ -10,6 +10,9 @@ La organización de los datos sigue una estructura arbórea y lógica:
 * **Esquema (Schema):** Espacio de nombres que agrupa objetos (Tablas, Vistas, Procedimientos).
 * **Tabla (Table):** Estructura bidimensional compuesta por filas (registros) y columnas (campos).
 * **Campo (Column):** Atributo específico definido por un tipo de dato (INTEGER, VARCHAR, etc.).
+## conectarse a una base de datos:
+
+    mysql -h 10.67.165.153 -u runcheck -p
 
 # Lenguaje de Manipulación y Definición de Datos (DML y DDL)
 
