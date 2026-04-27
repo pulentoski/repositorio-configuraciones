@@ -65,6 +65,8 @@ Este comando procesa el archivo YAML y aplica todas las tareas definidas de form
 
 ```bash
 ansible-playbook -i hosts.ini deploy.yml
+ansible-playbook -i hosts.ini tvheadend.yml --private-key=tv-headend.pem -u ubuntu
+
 ```
 
 ### 2. Comandos Ad-Hoc (Gestión y Auditoría en Tiempo Real)
