@@ -1,60 +1,290 @@
-# 🔐 Guía de Seguridad de Puertos (Port Security) en Switches Cisco
+# 🔐 Cisco Port Security Commands Cheat Sheet
 
-## 📌 Descripción
+## 📌 Introducción
 
-Este repositorio contiene una guía práctica sobre la configuración de **Port Security** en switches Cisco.  
-El objetivo es aprender a proteger puertos físicos restringiendo dispositivos mediante direcciones MAC autorizadas.
+Port Security permite controlar qué dispositivos pueden conectarse a un puerto de un switch Cisco mediante restricciones de direcciones MAC.
 
-La implementación de Port Security ayuda a prevenir accesos no autorizados y ataques comunes en redes LAN como el **MAC Flooding**.
+Se utiliza para:
 
----
-
-# 🧠 ¿Qué es Port Security?
-
-**Port Security** es una funcionalidad de los switches Cisco que permite:
-
-- Limitar dispositivos conectados por puerto.
-- Restringir direcciones MAC permitidas.
-- Detectar accesos no autorizados.
-- Bloquear ataques de inundación de MAC.
+- Restringir acceso no autorizado.
+- Limitar dispositivos conectados.
+- Mitigar ataques MAC Flooding.
 - Generar alertas de seguridad.
 
 ---
 
-# 🎯 Objetivos
+# ⚙️ Habilitar Modo Privilegiado
 
-- Configurar Port Security en switches Cisco.
-- Restringir dispositivos por dirección MAC.
-- Aplicar límites de conexiones por puerto.
-- Configurar acciones ante violaciones de seguridad.
-- Comprender modos de protección y mitigación.
+```bash
+enable
+```
 
 ---
 
-# 🛡 Beneficios de Implementar Port Security
+# ⚙️ Entrar al Modo de Configuración Global
 
-| Beneficio | Descripción |
-|---|---|
-| 🔒 Control de acceso | Permite definir qué dispositivos pueden conectarse |
-| 🚫 Mitigación de ataques | Protege contra ataques MAC Flooding |
-| 📢 Alertas de seguridad | Genera eventos Syslog ante violaciones |
-| ⚡ Respuesta rápida | Puede bloquear automáticamente dispositivos no autorizados |
+```bash
+configure terminal
+```
 
 ---
 
-# ⚙️ Requisitos Previos
+# ⚙️ Seleccionar Interfaz
 
-Antes de configurar Port Security:
-
-- Tener acceso administrativo al switch.
-- Identificar interfaces a proteger.
-- Definir política de seguridad.
-- Comprender modos de violación.
+```bash
+interface FastEthernet0/1
+```
 
 ---
 
-# 🖥 Topología Básica
+# ⚙️ Configurar Puerto en Modo Access
 
-```text
-PC1 -------- Switch Cisco -------- PC2
-                Fa0/1
+```bash
+switchport mode access
+```
+
+✅ Requisito obligatorio para Port Security.
+
+---
+
+# 🔐 Habilitar Port Security
+
+```bash
+switchport port-security
+```
+
+---
+
+# 🔢 Limitar Cantidad de Direcciones MAC
+
+## Permitir máximo 2 dispositivos
+
+```bash
+switchport port-security maximum 2
+```
+
+---
+
+# 📌 Sticky MAC
+
+## Aprender MAC automáticamente
+
+```bash
+switchport port-security mac-address sticky
+```
+
+✅ El switch aprende automáticamente las MAC conectadas.
+
+---
+
+# 🧾 Configurar MAC Manualmente
+
+```bash
+switchport port-security mac-address 0011.2233.4455
+```
+
+✅ Solo esa MAC podrá usar el puerto.
+
+---
+
+# 🚨 Modos de Violación
+
+---
+
+## 🔹 Protect
+
+```bash
+switchport port-security violation protect
+```
+
+### Características
+
+- Bloquea tráfico no autorizado.
+- No genera logs.
+- No apaga el puerto.
+
+---
+
+## 🔹 Restrict
+
+```bash
+switchport port-security violation restrict
+```
+
+### Características
+
+- Bloquea tráfico no autorizado.
+- Genera Syslog.
+- Incrementa contador de violaciones.
+- Mantiene el puerto activo.
+
+---
+
+## 🔹 Shutdown
+
+```bash
+switchport port-security violation shutdown
+```
+
+### Características
+
+- Puerto entra en estado `err-disabled`.
+- Apaga el puerto automáticamente.
+- Genera logs Syslog.
+
+---
+
+# 🔄 Reactivar Puerto Bloqueado
+
+```bash
+interface FastEthernet0/1
+shutdown
+no shutdown
+```
+
+---
+
+# 💾 Guardar Configuración
+
+```bash
+copy running-config startup-config
+```
+
+---
+
+# 🔍 Verificar Configuración
+
+---
+
+## Mostrar Estado General
+
+```bash
+show port-security
+```
+
+---
+
+## Ver Configuración de una Interfaz
+
+```bash
+show port-security interface FastEthernet0/1
+```
+
+---
+
+## Ver Direcciones MAC Aprendidas
+
+```bash
+show port-security address
+```
+
+---
+
+# 🧪 Configuración Completa de Ejemplo
+
+```bash
+enable
+
+configure terminal
+
+interface FastEthernet0/1
+
+switchport mode access
+
+switchport port-security
+
+switchport port-security maximum 2
+
+switchport port-security mac-address sticky
+
+switchport port-security violation restrict
+
+end
+
+copy running-config startup-config
+```
+
+---
+
+# ⚔️ Protección Contra MAC Flooding
+
+Port Security ayuda a mitigar ataques donde un atacante intenta llenar la tabla CAM del switch con múltiples direcciones MAC falsas.
+
+## Beneficios
+
+- Limita MAC por puerto.
+- Bloquea dispositivos no autorizados.
+- Reduce riesgos de sniffing.
+- Mejora seguridad LAN.
+
+---
+
+# 📚 Comandos Útiles Adicionales
+
+---
+
+## Ver Tabla MAC
+
+```bash
+show mac address-table
+```
+
+---
+
+## Ver Interfaces
+
+```bash
+show interfaces status
+```
+
+---
+
+## Ver Logs
+
+```bash
+show logging
+```
+
+---
+
+## Restaurar Configuración del Puerto
+
+```bash
+default interface FastEthernet0/1
+```
+
+---
+
+# 🛠 Tecnologías Relacionadas
+
+- Cisco IOS
+- Switching
+- VLANs
+- DHCP Snooping
+- Dynamic ARP Inspection
+- STP Security
+- Network Access Control
+
+---
+
+# 📖 Recomendaciones
+
+✅ Usar Port Security en puertos de usuarios finales.  
+✅ No utilizar en enlaces trunk.  
+✅ Combinar con VLAN Security.  
+✅ Revisar logs periódicamente.  
+✅ Configurar límites de MAC apropiados.
+
+---
+
+# 👨‍💻 Uso Educativo
+
+Repositorio orientado a:
+
+- Estudiantes de redes.
+- Laboratorios Cisco.
+- CCNA.
+- Seguridad en Switching.
+- Hardening de infraestructura LAN.
+
+---
