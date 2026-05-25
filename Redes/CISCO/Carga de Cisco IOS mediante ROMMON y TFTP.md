@@ -107,7 +107,7 @@ rommon 1 > IP_ADDRESS=192.168.20.1
 rommon 2 > IP_SUBNET_MASK=255.255.255.0
 rommon 3 > DEFAULT_GATEWAY=192.168.20.100
 rommon 4 > TFTP_SERVER=192.168.20.100
-rommon 5 > TFTP_FILE=2600.bin
+rommon 5 > TFTP_FILE=c2900-universalk9-mz.SPA.155-3.M4a.bin
 ```
 
 ---
