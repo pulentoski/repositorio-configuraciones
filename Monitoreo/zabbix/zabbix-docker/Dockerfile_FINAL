@@ -1,0 +1,2 @@
+FROM zabbix/zabbix-server-mysql:latest
+EXPOSE 80 443 10051 10050
