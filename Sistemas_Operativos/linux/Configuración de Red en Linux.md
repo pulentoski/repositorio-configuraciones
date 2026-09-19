@@ -326,19 +326,3 @@ nmcli device status
 
 ---
 
-## Checklist Diagnóstico 🔍
-
-- ✓ `ip a` → ¿Interfaz tiene IP?
-- ✓ `ip link show ens2` → ¿Estado UP/DOWN?
-- ✓ `ip route` → ¿Hay gateway?
-- ✓ `cat /etc/resolv.conf` → ¿DNS configurado?
-- ✓ `ping 8.8.8.8` → ¿Conecta internet?
-- ✓ `ethtool ens2` → ¿Enlace negociado correctamente?
-- ✓ `arp -a` → ¿Gateway visible en ARP?
-- ✓ `journalctl -u networking -n 20` → ¿Errores en logs?
-- ✓ `sudo netplan validate` → ¿Sintaxis YAML correcta?
-- ✓ `sudo netplan apply` o equiv. → ¿Configuración persistente?
-
----
-
-**Última revisión:** 2025 | CML Labs 🔧
