@@ -1,4 +1,4 @@
-# 🌳 Manual Técnico y Académico de Spanning Tree Protocol (STP)
+# 🌳 Manual Técnico Spanning Tree Protocol (STP)
 
 ## 📌 SECCIÓN 1: ¿Qué es STP y para qué se usa?
 
