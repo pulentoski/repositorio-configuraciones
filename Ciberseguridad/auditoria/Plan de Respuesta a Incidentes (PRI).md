@@ -165,4 +165,204 @@ Se reutiliza la lógica de **Riesgo = Probabilidad × Impacto**, pero aplicada a
 
 | **Tipo** | **Acción** | **Ejemplo** |
 |---|---|---|
-| ⏱️ Corto plazo | Aislar rápido | Desconectar equipo
+| ⏱️ Corto plazo | Aislar rápido | Desconectar equipo de la red (no apagarlo) |
+| 🕐 Largo plazo | Estabilizar | Bloquear IP en firewall, deshabilitar cuenta comprometida |
+
+**⚠️ Importante:** Antes de contener, **preservar evidencia** (imagen de disco, captura de memoria, copia de logs).
+
+### 🧹 Erradicación
+**Objetivo:** Eliminar la **causa raíz**.
+
+- 🦠 Eliminar malware y persistencias
+- 🔐 Cambiar credenciales comprometidas
+- 🩹 Parchar la vulnerabilidad explotada
+- 🔍 Verificar que no quedan otros equipos infectados
+
+### 🔄 Recuperación
+**Objetivo:** Volver a operar **de forma segura**.
+
+- 💾 Restaurar desde respaldo limpio
+- 🧪 Validar integridad antes de reconectar
+- 👀 Monitoreo reforzado (mínimo 30 días)
+- ✅ Confirmar con usuarios que el servicio funciona
+
+**✅ Correcto:** "Se restauró el servidor desde respaldo del 14/09, verificado con hash, y se parchó CVE explotada"
+**❌ Incorrecto:** "Se reinstaló y listo" (sin saber cómo entró el atacante → volverá a entrar)
+
+---
+
+## 6️⃣ Fase 4: 📚 Actividad Post-Incidente
+
+**Objetivo:** Que el incidente **no se repita**.
+
+### 🗣️ Reunión de Lecciones Aprendidas
+Realizarla **dentro de 2 semanas** tras el cierre:
+
+1. ❓ ¿Qué pasó y en qué orden? (línea de tiempo)
+2. ❓ ¿Qué funcionó bien?
+3. ❓ ¿Qué falló o se demoró?
+4. ❓ ¿Qué controles faltaban?
+5. ❓ ¿Qué cambiamos en el PRI?
+
+### 📄 Informe Final
+
+- 🕐 Línea de tiempo completa
+- 🎯 Causa raíz
+- 📊 Impacto real (sistemas, usuarios, datos, horas caídas, costo)
+- 🛠️ Acciones tomadas
+- 📋 Mejoras comprometidas (con responsable y fecha)
+
+---
+
+## 7️⃣ Marco Legal en Chile ⚖️
+
+Un PRI en Chile **debe considerar las obligaciones de reporte**:
+
+| **Norma** | **¿A quién aplica?** | **Obligación** |
+|---|---|---|
+| **Ley 21.663** (Ley Marco de Ciberseguridad) | Servicios esenciales y operadores de importancia vital | Reportar al CSIRT Nacional (ANCI): alerta temprana en **3 horas**, segundo informe en **72 horas** (24 h para OIV en servicios esenciales), informe final en **15 días** |
+| **Ley 21.719** (Protección de Datos Personales) | Quien trate datos personales | Notificar a la Agencia de Protección de Datos y, según el caso, a los titulares afectados, sin dilaciones indebidas |
+| **Normativa sectorial** (CMF, etc.) | Banca, cooperativas, seguros | Reporte según norma específica del regulador |
+
+**📌 Nota:** Verificar plazos vigentes en la normativa y reglamentos al momento de redactar el PRI.
+
+---
+
+## 8️⃣ Ejemplo: Cómo Aplicar a Cualquier Caso
+
+### 📖 Escenario 1: Ransomware (Cooperativa)
+
+**🔍 Detección:**
+- 08:15 — Usuarios reportan archivos con extensión `.locked`
+- 08:20 — EDR alerta cifrado masivo en servidor de archivos
+- 08:30 — Se confirma nota de rescate → **Incidente confirmado**
+
+**🚦 Clasificación:** 🔴 Crítica
+- Servidor de archivos + BD de socios (5.200 registros con RUT) afectados
+- Operación de atención detenida
+
+**🧱 Contención:**
+- 08:35 — Aislar segmento de red del servidor (VLAN en cuarentena)
+- 08:40 — Deshabilitar cuenta de servicio usada por el atacante
+- 08:45 — Captura de memoria e imagen de disco
+
+**🧹 Erradicación:**
+- Acceso inicial: RDP expuesto con credencial débil
+- Cierre de RDP público, reseteo de credenciales, eliminación de persistencias
+
+**🔄 Recuperación:**
+- Restauración desde respaldo offline del día anterior
+- Monitoreo reforzado 30 días
+
+**⚖️ Reporte:** CSIRT Nacional (alerta temprana en 3 h) + Agencia de Protección de Datos (datos personales afectados)
+
+**📚 Lecciones:** Implementar VPN con MFA, eliminar RDP público, reducir RPO a 4 horas
+
+---
+
+### 📖 Escenario 2: Phishing (Microempresa)
+
+**🔍 Detección:**
+- Empleado reporta correo sospechoso donde ingresó sus credenciales de correo
+
+**🚦 Clasificación:** 🟡 Media
+- 1 cuenta comprometida, sin evidencia de acceso a datos sensibles
+
+**🧱 Contención:** Cambio de contraseña + cierre de sesiones activas
+**🧹 Erradicación:** Revisión de reglas de reenvío creadas por el atacante (se elimina 1)
+**🔄 Recuperación:** Activar MFA en la cuenta
+**📚 Lecciones:** MFA obligatorio para toda la empresa + capacitación en phishing
+
+---
+
+### 🎯 El Punto Crítico
+
+Un PRI **no es un documento teórico**. Funciona solo si:
+1. **👥 Roles definidos:** cada persona sabe qué hacer
+2. **⏱️ Tiempos claros:** severidad → plazo de respuesta
+3. **📝 Todo registrado:** cada acción con hora y responsable
+4. **🧪 Se prueba:** simulacros al menos una vez al año
+
+---
+
+## 9️⃣ Plantilla de Registro de Incidente 📝
+
+```
+🆔 ID Incidente:        INC-2026-001
+📅 Fecha/hora detección:
+👤 Reportado por:
+📍 Sistemas afectados:
+📋 Tipo de incidente:   [ ] Malware [ ] Phishing [ ] Fuga de datos
+                        [ ] DDoS [ ] Acceso no autorizado [ ] Otro
+🚦 Severidad:           [ ] Baja [ ] Media [ ] Alta [ ] Crítica
+👥 Datos personales:    [ ] Sí [ ] No   → Cantidad aprox:
+⚖️ Requiere reporte:    [ ] CSIRT Nacional [ ] Agencia Datos [ ] Regulador
+
+🕐 LÍNEA DE TIEMPO:
+  HH:MM — Acción — Responsable
+
+🧱 Contención:
+🧹 Erradicación (causa raíz):
+🔄 Recuperación:
+📚 Lecciones aprendidas:
+✅ Fecha de cierre:
+```
+
+---
+
+## 🔟 Checklist Final
+
+Antes de entregar tu PRI:
+
+- [ ] 🛠️ **Preparación**
+  - [ ] 👥 Equipo de respuesta con roles y contactos
+  - [ ] 📋 Inventario de activos críticos
+  - [ ] 💾 Respaldos probados
+  - [ ] 🎯 Playbooks por tipo de incidente
+- [ ] 🔍 **Detección y Análisis**
+  - [ ] 📡 Fuentes de detección identificadas
+  - [ ] 🚦 Tabla de severidad con tiempos de respuesta
+- [ ] 🧱 **Contención / Erradicación / Recuperación**
+  - [ ] 🔒 Procedimiento de preservación de evidencia
+  - [ ] 🧹 Pasos para identificar causa raíz
+  - [ ] 🔄 Criterios para volver a operar
+- [ ] 📚 **Post-Incidente**
+  - [ ] 🗣️ Reunión de lecciones aprendidas
+  - [ ] 📄 Formato de informe final
+- [ ] ⚖️ **Legal**
+  - [ ] Ley 21.663 y Ley 21.719 revisadas
+  - [ ] Plazos de notificación documentados
+- [ ] 🔗 ¿Cité marcos? (NIST SP 800-61, ISO/IEC 27035)
+
+---
+
+## 🎓 Conclusión: No Improvisar, Responder
+
+**❌ El error común:** Reaccionar sin plan
+- "Apaguemos todo" → Se pierde evidencia
+- "Formateemos y listo" → El atacante vuelve a entrar
+- "No le digamos a nadie" → Incumplimiento legal
+
+**✅ Lo correcto:** Seguir fases definidas
+- Detectar → Clasificar → Contener → Erradicar → Recuperar → Aprender
+- Cada acción registrada, con responsable y hora
+- Reportar dentro de los plazos legales
+
+---
+
+### 🎯 El Ciclo Completo
+
+**🛠️ Preparar → 🔍 Detectar → 🧱 Contener → 🧹 Erradicar → 🔄 Recuperar → 📚 Aprender**
+
+**⚠️ Un incidente sin plan = crisis. Un incidente con plan = procedimiento.**
+
+---
+
+## 📚 Referencias
+
+- NIST SP 800-61 Rev.2 — *Computer Security Incident Handling Guide*
+- NIST SP 800-61 Rev.3 — *Incident Response Recommendations and Considerations for Cybersecurity Risk Management*
+- ISO/IEC 27035-1:2023 — *Information security incident management*
+- Ley 21.663 — Ley Marco de Ciberseguridad (Chile)
+- Ley 21.719 — Protección de Datos Personales (Chile)
+- CSIRT Nacional / ANCI — https://www.csirt.gob.cl
