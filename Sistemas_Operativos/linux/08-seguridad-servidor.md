@@ -10,21 +10,54 @@
 >
 > **Para qué sirve:** Es la puerta de entrada al servidor: si SSH es débil, todo el servidor lo es.
 
-### Autenticación con clave pública (recomendado)
+### Llaves SSH paso a paso
 
-```bash
-# En tu máquina local: generar par de claves
-ssh-keygen -t ed25519 -C "tu@email.com"         # Ed25519 (recomendado, más seguro)
-ssh-keygen -t rsa -b 4096 -C "tu@email.com"     # RSA 4096 bits (alternativa)
+**Lógica del par de llaves**
 
-# Copiar clave pública al servidor
-ssh-copy-id usuario@servidor
-# O manualmente:
-cat ~/.ssh/id_ed25519.pub | ssh usuario@servidor "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+Se usa criptografía asimétrica: se crean **dos llaves** que funcionan juntas, como una llave y su candado.
 
-# Verificar que funciona ANTES de deshabilitar contraseñas
-ssh usuario@servidor
+| Archivo | Tipo | Dónde queda | ¿Se envía? |
+|---|---|---|---|
+| `~/.ssh/daniel` | Privada (la llave) | Solo en el PC | **Nunca** |
+| `~/.ssh/daniel.pub` | Pública (el candado) | PC y servidor (`~/.ssh/authorized_keys`) | Sí, sin riesgo |
+
 ```
+PC                                         Servidor
+1. ssh-keygen crea daniel + daniel.pub
+2. Se envía SOLO daniel.pub        ───►    Se guarda en ~/.ssh/authorized_keys
+3. ssh -i daniel                   ◄──►    Desafío: el PC lo firma con la privada
+4.                                         Verifica la firma con la pública → entra
+```
+
+La llave privada **nunca viaja por la red**: el servidor solo comprueba que el PC la tiene.
+
+**1. Crear el par de llaves** (en el PC, no en el servidor)
+```bash
+ssh-keygen -t ed25519 -f ~/.ssh/daniel
+```
+- `-f` define el nombre del archivo: permite tener una llave distinta por usuario o servidor.
+- La frase de paso (*passphrase*) es opcional: protege la llave privada si alguien roba el archivo. `Enter` dos veces para dejarla vacía.
+
+**2. Enviar solo la llave pública al servidor**
+
+Linux / macOS:
+```bash
+ssh-copy-id -i ~/.ssh/daniel.pub daniel@IP
+```
+Pide una vez la contraseña del usuario. Si se repite, avisa que la llave ya existe (`All keys were skipped`).
+
+Windows (PowerShell), donde `ssh-copy-id` no existe:
+```powershell
+type $env:USERPROFILE\.ssh\daniel.pub | ssh daniel@IP "mkdir -p ~/.ssh && chmod 700 ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
+```
+
+AWS EC2: el login con contraseña viene deshabilitado y ninguna de las dos opciones funciona. Ver guía 13, sección *Dar acceso SSH a usuarios nuevos*.
+
+**3. Conectarse con la llave**
+```bash
+ssh -i ~/.ssh/daniel daniel@IP
+```
+Debe pedir la frase de la llave, **no** la contraseña del usuario. Verificar que funciona **antes** de deshabilitar las contraseñas.
 
 ### Hardening de /etc/ssh/sshd_config
 
@@ -93,13 +126,27 @@ Respuestas recomendadas: `y` (códigos basados en tiempo) → escanear el QR con
 
 **3. Configurar PAM** en `/etc/pam.d/sshd`
 ```bash
-# Comentar esta línea: si no, además pedirá la contraseña Linux
+nano /etc/pam.d/sshd
+```
+Cerca del inicio (línea 4), comentar esta línea agregando `#`; si no, además del código pedirá la contraseña del usuario:
+```bash
 #@include common-auth
+```
+Al final del archivo, agregar:
+```bash
+auth required pam_google_authenticator.so
+```
+Guardar con `Ctrl+O` + `Enter` y salir con `Ctrl+X`. Verificar:
+```bash
+grep common-auth /etc/pam.d/sshd      # Debe mostrar: #@include common-auth
+tail -1 /etc/pam.d/sshd               # Debe mostrar la línea de pam_google_authenticator
+```
 
-# Agregar al final:
+Sin `nullok`, el MFA es obligatorio: un usuario no enrolado no puede entrar. **Alternativa de transición** (por ejemplo en EC2, mientras se enrola `ubuntu`):
+```bash
 auth required pam_google_authenticator.so nullok
 ```
-`nullok` deja entrar sin MFA a usuarios que aún no se enrolan (por ejemplo `ubuntu`). Cuando todos estén enrolados, se quita para que el MFA sea obligatorio.
+Cuando todos estén enrolados, se quita `nullok`.
 
 **4. Configurar SSH** en `/etc/ssh/sshd_config.d/10-seguridad.conf`
 ```bash
@@ -109,12 +156,35 @@ KbdInteractiveAuthentication yes
 AuthenticationMethods publickey,keyboard-interactive
 ```
 
+**Alternativa sin editor:** crear el archivo completo con un solo comando. Evita el error de cerrar nano sin guardar:
+```bash
+cat > /etc/ssh/sshd_config.d/10-seguridad.conf << 'EOF'
+PermitRootLogin no
+PasswordAuthentication no
+KbdInteractiveAuthentication yes
+AuthenticationMethods publickey,keyboard-interactive
+EOF
+
+cat /etc/ssh/sshd_config.d/10-seguridad.conf   # Verificar contenido
+```
+`>` **reemplaza** el archivo completo: si ya tenía otras directivas, deben incluirse en el bloque.
+
 **5. Aplicar y probar**
 ```bash
 sudo sshd -t && sudo systemctl restart ssh
-# Desde otra terminal:
-ssh -i llave.pem usr_admin@IP_PUBLICA
-# Debe pedir: Verification code:
+# Desde otra terminal del PC:
+ssh -i ~/.ssh/daniel daniel@IP
+# Debe pedir: la frase de la llave y luego Verification code:
+```
+
+**6. Probar un login fallido** (evidencia de que la contraseña está bloqueada)
+```bash
+# Desde el PC: forzar un intento sin llave
+ssh -o PubkeyAuthentication=no daniel@IP
+# Resultado esperado: Permission denied
+
+# En el servidor: ver el intento en el registro
+sudo journalctl -u ssh --since today --no-pager
 ```
 
 > El TOTP depende de la hora. Si los códigos fallan siempre, revisar `timedatectl` en el servidor y la hora del celular.
