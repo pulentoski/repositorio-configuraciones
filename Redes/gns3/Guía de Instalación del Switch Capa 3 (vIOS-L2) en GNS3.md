@@ -8,20 +8,30 @@ Esta guía detalla los pasos para importar, configurar y desplegar una imagen de
 
 Para practicar características avanzadas de Capa 2 y Capa 3 (Seguridad L2, VLANs, Troncales, EtherChannel, SVI, DHCP Snooping, Enrutamiento Inter-VLAN), se utiliza la imagen virtualizada oficial de Cisco **vIOS-L2** (Virtual IOS Layer 2).
 
-### Información de la Imagen Utillizada
+### Información de la Imagen Utilizada
 
-* **Nombre del archivo original / descarga:** `vios_l2-adventerprisek9-m.vmdk.SSA.152-4.0.55.E`
+* **Nombre del archivo:** `vios_l2-adventerprisek9-m.vmdk.SSA.152-4.0.55.E`
+* **Tamaño:** ~96,9 MB
 * **Formato de disco:** Virtual Machine Disk (`.vmdk`)
 * **Versión de IOS:** 15.2(4)0.55.E
 * **Enlace de referencia de descarga:** [https://upw.io/75g/vios_l2-adventerprisek9-m.vmdk.SSA.152-4.0.55.E](https://upw.io/75g/vios_l2-adventerprisek9-m.vmdk.SSA.152-4.0.55.E)
+
+### Entorno probado
+
+| Componente | Valor |
+| :--- | :--- |
+| Sistema anfitrión | Linux (Ubuntu) |
+| Binario QEMU | `/bin/qemu-system-x86_64` (v8.2.2) |
+| Ubicación de la imagen | `~/Documentos/ios/` |
+| Servidor | Local (sin GNS3 VM) |
 
 ---
 
 ## 2. Métodos de Instalación en GNS3
 
 Existen dos opciones principales para agregar este switch en GNS3:
-1. **Método A (Recomendado):** Importando el archivo de plantilla `.gns3a` (Appliance).
-2. **Método B (Manual):** Creando un nuevo nodo QEMU manualmente.
+1. **Método A:** Importando el archivo de plantilla `.gns3a` (Appliance).
+2. **Método B (usado en este lab):** Creando un nuevo nodo QEMU manualmente.
 
 ---
 
@@ -31,14 +41,13 @@ Existen dos opciones principales para agregar este switch en GNS3:
    * Ve a la web oficial de GNS3 Marketplace y descarga la plantilla **Cisco vIOS-L2** (`cisco-vios-l2.gns3a`).
 2. **Importar en GNS3:**
    * Abre GNS3.
-   * Ve a **File** $
-ightarrow$ **Import appliance**.
+   * Ve a **File** → **Import appliance**.
    * Selecciona el archivo `cisco-vios-l2.gns3a` descargado.
 3. **Selección del Servidor:**
-   * Selecciona ejecutar el appliance en la **GNS3 VM** (altamente recomendado para rendimiento QEMU).
+   * Selecciona ejecutar el appliance en la **GNS3 VM** (recomendado para rendimiento QEMU) o en el servidor local si tu equipo es Linux.
 4. **Asociación del Archivo `.vmdk`:**
    * En la lista de versiones, busca la versión correspondiente o haz clic en **Import**.
-   * Selecciona el archivo descargado: `vios_l2-adventerprisek9-m.vmdk.SSA.152-4.0.55.E`.
+   * Selecciona el archivo `vios_l2-adventerprisek9-m.vmdk.SSA.152-4.0.55.E`.
    * El sistema verificará el archivo y procederá con la instalación.
 5. **Finalización:**
    * Haz clic en **Next** hasta finalizar. El switch aparecerá disponible en el panel izquierdo bajo el icono de Switches.
@@ -47,60 +56,122 @@ ightarrow$ **Import appliance**.
 
 ### Método B: Instalación Manual como QEMU VM
 
-Si prefieres realizar el procedimiento manualmente sin usar la plantilla `.gns3a`:
+#### Paso 1 — Crear la plantilla
 
-1. **Abrir Preferencias de GNS3:**
-   * Dirígete a **Edit** $
-ightarrow$ **Preferences** (o `Ctrl + Shift + P`).
-   * En el menú lateral, ve a **QEMU** $
-ightarrow$ **QEMU VMs**.
-   * Haz clic en el botón **New**.
+1. Ve a **Edit** → **Preferences** (`Ctrl + Shift + P`).
+2. En el menú lateral, ve a **QEMU** → **Qemu VMs** y haz clic en **New**.
 
-2. **Configuración del Appliance:**
-   * **Name:** Asigna un nombre al nodo (ejemplo: `Cisco vIOS-L2 15.2`).
-   * **Type:** Selecciona `Default`.
-   * **RAM:** Asigna un mínimo de **512 MB** o **1024 MB** (1 GB recomendado para labs grandes).
-   * **Console type:** Selecciona `telnet`.
-   * **Disk Image:** Selecciona **Existing image** si ya la habías usado, o **New image** y busca el archivo `vios_l2-adventerprisek9-m.vmdk.SSA.152-4.0.55.E`.
+#### Paso 2 — Nombre de la VM
 
-3. **Ajuste de Puertos y Símbolo (Edición del Nodo):**
-   * Selecciona el nodo recién creado y haz clic en **Edit**.
-   * En la pestaña **Network**:
-     * **Adapters:** Cambia la cantidad de adaptadores a **8** o **16** (según la cantidad de puertos GigabitEthernet que requieras).
-     * **Type:** Selecciona `e1000`.
-     * **Custom adapter name format:** Configura `Gi0/{port}` para que las interfaces se nombren como `GigabitEthernet0/0`, `GigabitEthernet0/1`, etc.
-   * En la pestaña **General settings**:
-     * **Symbol:** Cambia el icono a `/symbols/multilayer_switch.svg` o el icono de Switch L3.
-     * **Category:** Asigna la categoría `Switches`.
-   * Haz clic en **Apply** y **OK**.
+* **Name:** `SW-CAPA-3-CISCO`
+* **This is a legacy ASA VM:** sin marcar.
+
+![Nombre de la VM](img/01-nombre.png)
+
+#### Paso 3 — Binario QEMU y memoria
+
+* **Qemu binary:** `/bin/qemu-system-x86_64 (v8.2.2)`
+* **RAM:** `512 MB`
+
+![Binario y RAM](img/02-binario-ram.png)
+
+#### Paso 4 — Tipo de consola
+
+* **Console type:** `telnet`
+
+![Consola](img/03-consola.png)
+
+#### Paso 5 — Imagen de disco
+
+* Selecciona **New Image** → **Browse...**
+* Busca el archivo en `~/Documentos/ios/vios_l2-adventerprisek9-m.vmdk.SSA.152-4.0.55.E`.
+* Haz clic en **Finish**.
+
+![Selección de imagen](img/04-seleccion-imagen.png)
+![Disk image](img/05-disk-image.png)
+
+> GNS3 puede preguntar si copiar la imagen al directorio de imágenes por defecto. Se recomienda aceptar.
+
+---
+
+#### Paso 6 — Editar la plantilla
+
+Selecciona `SW-CAPA-3-CISCO` en la lista y haz clic en **Edit**.
+
+##### Pestaña General settings
+
+| Campo | Valor |
+| :--- | :--- |
+| Template name | `SW-CAPA-3-CISCO` |
+| Default name format | `{name}-{0}` |
+| Symbol | `:/symbols/qemu_guest.svg` (opcional: `multilayer_switch.svg`) |
+| Category | `Switches` |
+| RAM | `512 MB` |
+| vCPUs | `1` |
+| Qemu binary | `/bin/qemu-system-x86_64 (v8.2.2)` |
+| Boot priority | `HDD` |
+| On close | `Power off the VM` |
+| Console type | `telnet` |
+
+![General settings](img/06-general-settings.png)
+
+##### Pestaña Network
+
+| Campo | Valor |
+| :--- | :--- |
+| Adapters | `8` |
+| First port name | *(vacío)* |
+| Name format | `Ethernet{0}` (ver nota) |
+| Segment size | `0` |
+| Type | `Intel Gigabit Ethernet (e1000)` |
+| Replicate network connection states in Qemu | ✅ |
+| Use the legacy networking mode | ❌ |
+
+![Network](img/07-network.png)
+
+> **Nota sobre nombres de interfaz:** el *Name format* solo cambia la etiqueta que muestra GNS3, no el nombre dentro del IOS. vIOS-L2 agrupa los puertos de a 4 (`Gi0/0`–`Gi0/3`, `Gi1/0`–`Gi1/3`). Para que las etiquetas de GNS3 coincidan con el IOS, usa:
+> * **Name format:** `Gi{1}/{0}`
+> * **Segment size:** `4`
+
+##### Pestaña Advanced
+
+| Campo | Valor |
+| :--- | :--- |
+| Options | `-no-kvm` |
+| Use as a linked base VM | ✅ |
+| Activate CPU throttling | ❌ |
+| Process priority | `Normal` |
+| TPM / UEFI | ❌ |
+
+![Advanced](img/08-advanced.png)
+
+> **Sobre `-no-kvm`:** desactiva la aceleración por hardware (KVM) y usa emulación TCG. Es necesario cuando el anfitrión no tiene KVM disponible (virtualización deshabilitada en BIOS, o GNS3 corriendo dentro de otra VM). El switch funciona, pero el arranque es más lento (varios minutos). Si tu equipo soporta KVM (`kvm-ok` o `ls /dev/kvm`), elimina esta opción.
+
+Haz clic en **Apply** y **OK**.
 
 ---
 
 ## 3. Primer Inicio y Verificación
 
-1. Arrastra el nuevo nodo **Cisco vIOS-L2** desde la barra de herramientas al lienzo de GNS3.
-2. Haz clic derecho sobre el nodo y presiona **Start**.
-3. Haz doble clic en el nodo para abrir la consola Telnet/PuTTY.
+1. Arrastra el nodo **SW-CAPA-3-CISCO** desde la categoría Switches al lienzo.
+2. Clic derecho sobre el nodo → **Start**.
+3. Doble clic para abrir la consola Telnet. Espera a que termine el arranque (con `-no-kvm` puede tardar bastante).
 
 ### Comandos de Verificación en la Consola Cisco IOS
-
-Una vez cargado el sistema operativo, ejecuta los siguientes comandos para confirmar que las funciones de Capa 2 y Capa 3 están disponibles:
 
 #### 1. Verificar Versión e Imagen del IOS
 ```text
 Switch# show version
 ```
-*Debes verificar que muestre la versión `15.2` y la plataforma `vIOS-L2`.*
+*Debe mostrar la versión `15.2` y la plataforma `vIOS-L2`.*
 
 #### 2. Verificar Interfaces Disponibles
 ```text
 Switch# show ip interface brief
 ```
-*Confirmará las interfaces GigabitEthernet activas (`Gi0/0`, `Gi0/1`, etc.).*
+*Con 8 adaptadores se verán `Gi0/0`–`Gi0/3` y `Gi1/0`–`Gi1/3`.*
 
-#### 3. Verificar Capacidad Multicapa (Habilitar Enrutamiento IP)
-Por defecto, el switch actúa en modo Capa 2 pura. Para habilitar las capacidades de **Switch Capa 3 (Routing Inter-VLAN / SVIs)**:
-
+#### 3. Habilitar Enrutamiento IP (Capa 3)
 ```text
 Switch# configure terminal
 Switch(config)# ip routing
@@ -116,12 +187,12 @@ Switch(config)# interface vlan 10
 Switch(config-if)# ip address 192.168.10.1 255.255.255.0
 Switch(config-if)# no shutdown
 ```
+*La SVI quedará `up/up` solo cuando al menos un puerto activo pertenezca a la VLAN 10.*
 
 #### 5. Verificar la Tabla de Enrutamiento
 ```text
 Switch# show ip route
 ```
-*Confirmará que el switch está operando como dispositivo Capa 3 al mostrar las redes directamente conectadas.*
 
 ---
 
@@ -129,9 +200,9 @@ Switch# show ip route
 
 | Problema | Causa Probable | Solución |
 | :--- | :--- | :--- |
-| **El switch no arranca o entra en bucle de reinicio** | RAM insuficiente asignada al nodo QEMU. | Aumentar la memoria RAM a 1024 MB en las propiedades de la VM QEMU en GNS3. |
-| **No reconoce el comando `ip routing`** | La imagen cargada no es un vIOS-L2 o se está usando un modelo L2 básico. | Confirmar mediante `show version` que la imagen corresponda al archivo `vios_l2-adventerprisek9-m.vmdk...`. |
-| **Nombres de interfaz extraños (`e0/0` en lugar de `Gi0/0`)** | Formato de adaptador no configurado en la plantilla. | En Preferencias de GNS3 $
-ightarrow$ QEMU VMs $
-ightarrow$ Edit $
-ightarrow$ Network, configurar *Custom adapter name format* a `Gi0/{port}`. |
+| **El switch no arranca o entra en bucle de reinicio** | RAM insuficiente. | Subir la RAM a 768 MB o 1024 MB en **General settings**. |
+| **Arranque extremadamente lento** | Uso de `-no-kvm` (emulación sin aceleración). | Habilitar virtualización (VT-x/AMD-V) en BIOS y quitar `-no-kvm` de **Advanced → Options**. |
+| **Error "KVM acceleration can't be used"** | KVM no disponible en el anfitrión. | Agregar `-no-kvm` en **Advanced → Options**. |
+| **No reconoce el comando `ip routing`** | La imagen no es vIOS-L2. | Confirmar con `show version`. |
+| **Etiquetas en GNS3 (`Ethernet0`) no coinciden con el IOS (`Gi0/0`)** | Name format por defecto. | **Network** → Name format `Gi{1}/{0}`, Segment size `4`. |
+| **SVI en estado `down/down`** | Ningún puerto activo asignado a la VLAN. | Asignar un puerto con `switchport access vlan 10` y conectar un host. |
