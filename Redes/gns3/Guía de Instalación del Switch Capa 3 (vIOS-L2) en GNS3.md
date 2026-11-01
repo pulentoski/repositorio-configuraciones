@@ -66,29 +66,20 @@ Existen dos opciones principales para agregar este switch en GNS3:
 * **Name:** `SW-CAPA-3-CISCO`
 * **This is a legacy ASA VM:** sin marcar.
 
-![Nombre de la VM](img/01-nombre.png)
-
 #### Paso 3 — Binario QEMU y memoria
 
 * **Qemu binary:** `/bin/qemu-system-x86_64 (v8.2.2)`
 * **RAM:** `512 MB`
 
-![Binario y RAM](img/02-binario-ram.png)
-
 #### Paso 4 — Tipo de consola
 
 * **Console type:** `telnet`
-
-![Consola](img/03-consola.png)
 
 #### Paso 5 — Imagen de disco
 
 * Selecciona **New Image** → **Browse...**
 * Busca el archivo en `~/Documentos/ios/vios_l2-adventerprisek9-m.vmdk.SSA.152-4.0.55.E`.
 * Haz clic en **Finish**.
-
-![Selección de imagen](img/04-seleccion-imagen.png)
-![Disk image](img/05-disk-image.png)
 
 > GNS3 puede preguntar si copiar la imagen al directorio de imágenes por defecto. Se recomienda aceptar.
 
@@ -113,8 +104,6 @@ Selecciona `SW-CAPA-3-CISCO` en la lista y haz clic en **Edit**.
 | On close | `Power off the VM` |
 | Console type | `telnet` |
 
-![General settings](img/06-general-settings.png)
-
 ##### Pestaña Network
 
 | Campo | Valor |
@@ -126,8 +115,6 @@ Selecciona `SW-CAPA-3-CISCO` en la lista y haz clic en **Edit**.
 | Type | `Intel Gigabit Ethernet (e1000)` |
 | Replicate network connection states in Qemu | ✅ |
 | Use the legacy networking mode | ❌ |
-
-![Network](img/07-network.png)
 
 > **Nota sobre nombres de interfaz:** el *Name format* solo cambia la etiqueta que muestra GNS3, no el nombre dentro del IOS. vIOS-L2 agrupa los puertos de a 4 (`Gi0/0`–`Gi0/3`, `Gi1/0`–`Gi1/3`). Para que las etiquetas de GNS3 coincidan con el IOS, usa:
 > * **Name format:** `Gi{1}/{0}`
@@ -142,8 +129,6 @@ Selecciona `SW-CAPA-3-CISCO` en la lista y haz clic en **Edit**.
 | Activate CPU throttling | ❌ |
 | Process priority | `Normal` |
 | TPM / UEFI | ❌ |
-
-![Advanced](img/08-advanced.png)
 
 > **Sobre `-no-kvm`:** desactiva la aceleración por hardware (KVM) y usa emulación TCG. Es necesario cuando el anfitrión no tiene KVM disponible (virtualización deshabilitada en BIOS, o GNS3 corriendo dentro de otra VM). El switch funciona, pero el arranque es más lento (varios minutos). Si tu equipo soporta KVM (`kvm-ok` o `ls /dev/kvm`), elimina esta opción.
 
