@@ -1,1114 +1,817 @@
-annotations:
-  - type: text
-    border_color: '#00000000'
-    border_style: ''
-    color: '#1F2937'
-    rotation: 0
-    text_bold: true
-    text_content: |-
-      🔐 LAB SSH + TACACS+
-      Dominio: lab.local | SSHv2 en todos los equipos
-      Usuario local: admin / Admin123
-      Enable: cisco123
-      TACACS+: 10.10.10.2 | key: demo
-      Ruteo: OSPF área 0 | NAT en RT-EDGE
-    text_font: monospace
-    text_italic: false
-    text_size: 11
-    text_unit: pt
-    thickness: 1
-    x1: -760.0
-    y1: -480.0
-    z_index: 1
-  - type: text
-    border_color: '#00000000'
-    border_style: ''
-    color: '#B91C1C'
-    rotation: 0
-    text_bold: false
-    text_content: |-
-      RT-EDGE
-      Gi0/0: DHCP (NAT / Internet)
-      Gi0/1: 10.0.0.1/30  → RT-1
-      Gi0/2: 10.0.0.5/30  → RT-2
-      Gi0/3: 10.0.0.9/30  → RT-3
-      Gi0/4: 10.0.0.13/30 → RT-4
-      Gi0/5: 10.10.10.1/24 → TACACS
-    text_font: monospace
-    text_italic: false
-    text_size: 10
-    text_unit: pt
-    thickness: 1
-    x1: -360.0
-    y1: -330.0
-    z_index: 1
-  - type: text
-    border_color: '#00000000'
-    border_style: ''
-    color: '#047857'
-    rotation: 0
-    text_bold: false
-    text_content: |-
-      TACACS-SRV (Ubuntu)
-      ens2: 10.10.10.2/24
-      GW: 10.10.10.1
-      TCP 49 (tac_plus-ng)
-      SSH: cisco / cisco
-    text_font: monospace
-    text_italic: false
-    text_size: 10
-    text_unit: pt
-    thickness: 1
-    x1: 380.0
-    y1: -300.0
-    z_index: 1
-  - type: text
-    border_color: '#00000000'
-    border_style: ''
-    color: '#1D4ED8'
-    rotation: 0
-    text_bold: false
-    text_content: |-
-      RT-1
-      Gi0/0: 10.0.0.2/30
-      Gi0/1.10: 192.168.10.1/24
-    text_font: monospace
-    text_italic: false
-    text_size: 10
-    text_unit: pt
-    thickness: 1
-    x1: -440.0
-    y1: -80.0
-    z_index: 1
-  - type: text
-    border_color: '#00000000'
-    border_style: ''
-    color: '#1D4ED8'
-    rotation: 0
-    text_bold: false
-    text_content: |-
-      RT-2
-      Gi0/0: 10.0.0.6/30
-      Gi0/1.20: 192.168.20.1/24
-    text_font: monospace
-    text_italic: false
-    text_size: 10
-    text_unit: pt
-    thickness: 1
-    x1: -120.0
-    y1: -80.0
-    z_index: 1
-  - type: text
-    border_color: '#00000000'
-    border_style: ''
-    color: '#1D4ED8'
-    rotation: 0
-    text_bold: false
-    text_content: |-
-      RT-3
-      Gi0/0: 10.0.0.10/30
-      Gi0/1.30: 192.168.30.1/24
-    text_font: monospace
-    text_italic: false
-    text_size: 10
-    text_unit: pt
-    thickness: 1
-    x1: 200.0
-    y1: -80.0
-    z_index: 1
-  - type: text
-    border_color: '#00000000'
-    border_style: ''
-    color: '#1D4ED8'
-    rotation: 0
-    text_bold: false
-    text_content: |-
-      RT-4
-      Gi0/0: 10.0.0.14/30
-      Gi0/1.40: 192.168.40.1/24
-    text_font: monospace
-    text_italic: false
-    text_size: 10
-    text_unit: pt
-    thickness: 1
-    x1: 520.0
-    y1: -80.0
-    z_index: 1
-  - type: text
-    border_color: '#00000000'
-    border_style: ''
-    color: '#7C3AED'
-    rotation: 0
-    text_bold: false
-    text_content: |-
-      SW-1 · VLAN 10
-      SVI: 192.168.10.2/24
-      GW: 192.168.10.1
-      Gi0/0 trunk | Gi0/1-3 access
-    text_font: monospace
-    text_italic: false
-    text_size: 10
-    text_unit: pt
-    thickness: 1
-    x1: -560.0
-    y1: 210.0
-    z_index: 1
-  - type: text
-    border_color: '#00000000'
-    border_style: ''
-    color: '#7C3AED'
-    rotation: 0
-    text_bold: false
-    text_content: |-
-      SW-2 · VLAN 20
-      SVI: 192.168.20.2/24
-      GW: 192.168.20.1
-      Gi0/0 trunk | Gi0/1-3 access
-    text_font: monospace
-    text_italic: false
-    text_size: 10
-    text_unit: pt
-    thickness: 1
-    x1: -240.0
-    y1: 210.0
-    z_index: 1
-  - type: text
-    border_color: '#00000000'
-    border_style: ''
-    color: '#7C3AED'
-    rotation: 0
-    text_bold: false
-    text_content: |-
-      SW-3 · VLAN 30
-      SVI: 192.168.30.2/24
-      GW: 192.168.30.1
-      Gi0/0 trunk | Gi0/1-3 access
-    text_font: monospace
-    text_italic: false
-    text_size: 10
-    text_unit: pt
-    thickness: 1
-    x1: 80.0
-    y1: 210.0
-    z_index: 1
-  - type: text
-    border_color: '#00000000'
-    border_style: ''
-    color: '#7C3AED'
-    rotation: 0
-    text_bold: false
-    text_content: |-
-      SW-4 · VLAN 40
-      SVI: 192.168.40.2/24
-      GW: 192.168.40.1
-      Gi0/0 trunk | Gi0/1-3 access
-    text_font: monospace
-    text_italic: false
-    text_size: 10
-    text_unit: pt
-    thickness: 1
-    x1: 400.0
-    y1: 210.0
-    z_index: 1
-nodes:
-  - boot_disk_size: null
-    configuration: NAT
-    cpu_limit: null
-    cpus: null
-    data_volume: null
-    hide_links: false
-    id: n0
-    image_definition: null
-    label: INTERNET
-    node_definition: external_connector
-    ram: null
-    tags: []
-    x: 0
-    y: -440
-    interfaces:
-      - id: i0
-        label: port
-        slot: 0
-        type: physical
-  - boot_disk_size: null
-    configuration: |-
-      hostname RT-EDGE
-      no ip domain-lookup
-      ip domain-name lab.local
-      enable secret cisco123
-      username admin privilege 15 secret Admin123
-      !
-      aaa new-model
-      aaa authentication login TACACS_LOGIN group tacacs+ local
-      aaa authentication login CONSOLE none
-      !
-      tacacs server TACACS-SERVER
-       address ipv4 10.10.10.2
-       key demo
-       timeout 3
-      !
-      crypto key generate rsa general-keys modulus 2048
-      ip ssh version 2
-      ip ssh time-out 60
-      ip ssh authentication-retries 3
-      !
-      interface GigabitEthernet0/0
-       description WAN-NAT
-       ip address dhcp
-       ip nat outside
-       no shutdown
-      !
-      interface GigabitEthernet0/1
-       description TO-RT-1
-       ip address 10.0.0.1 255.255.255.252
-       ip nat inside
-       no shutdown
-      !
-      interface GigabitEthernet0/2
-       description TO-RT-2
-       ip address 10.0.0.5 255.255.255.252
-       ip nat inside
-       no shutdown
-      !
-      interface GigabitEthernet0/3
-       description TO-RT-3
-       ip address 10.0.0.9 255.255.255.252
-       ip nat inside
-       no shutdown
-      !
-      interface GigabitEthernet0/4
-       description TO-RT-4
-       ip address 10.0.0.13 255.255.255.252
-       ip nat inside
-       no shutdown
-      !
-      interface GigabitEthernet0/5
-       description TO-TACACS-SRV
-       ip address 10.10.10.1 255.255.255.0
-       ip nat inside
-       no shutdown
-      !
-      router ospf 1
-       router-id 1.1.1.1
-       passive-interface GigabitEthernet0/5
-       network 10.0.0.0 0.0.0.15 area 0
-       network 10.10.10.0 0.0.0.255 area 0
-       default-information originate
-      !
-      ip access-list standard NAT-INSIDE
-       permit 10.0.0.0 0.255.255.255
-       permit 192.168.0.0 0.0.255.255
-      !
-      ip nat inside source list NAT-INSIDE interface GigabitEthernet0/0 overload
-      !
-      line con 0
-       login authentication CONSOLE
-       exec-timeout 0 0
-       logging synchronous
-      line vty 0 4
-       login authentication TACACS_LOGIN
-       transport input ssh
-       exec-timeout 5 0
-      !
-      end
-    cpu_limit: null
-    cpus: null
-    data_volume: null
-    hide_links: false
-    id: n1
-    image_definition: null
-    label: RT-EDGE
-    node_definition: iosv
-    ram: null
-    tags: []
-    x: 0
-    y: -240
-    interfaces:
-      - id: i0
-        label: GigabitEthernet0/0
-        slot: 0
-        type: physical
-      - id: i1
-        label: GigabitEthernet0/1
-        slot: 1
-        type: physical
-      - id: i2
-        label: GigabitEthernet0/2
-        slot: 2
-        type: physical
-      - id: i3
-        label: GigabitEthernet0/3
-        slot: 3
-        type: physical
-      - id: i4
-        label: GigabitEthernet0/4
-        slot: 4
-        type: physical
-      - id: i5
-        label: GigabitEthernet0/5
-        slot: 5
-        type: physical
-  - boot_disk_size: null
-    configuration: |-
-      #cloud-config
-      hostname: TACACS-SRV
-      manage_etc_hosts: true
-      system_info:
-        default_user:
-          name: cisco
-      password: cisco
-      chpasswd: { expire: false }
-      ssh_pwauth: true
-      write_files:
-        - path: /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
-          content: |
-            network: {config: disabled}
-        - path: /etc/netplan/99-lab.yaml
-          permissions: '0600'
-          content: |
-            network:
-              version: 2
-              ethernets:
-                lan:
-                  match:
-                    name: "ens*"
-                  dhcp4: false
-                  addresses: [10.10.10.2/24]
-                  routes:
-                    - to: default
-                      via: 10.10.10.1
-                  nameservers:
-                    addresses: [8.8.8.8, 1.1.1.1]
-      runcmd:
-        - rm -f /etc/netplan/50-cloud-init.yaml
-        - netplan apply
-    cpu_limit: null
-    cpus: null
-    data_volume: null
-    hide_links: false
-    id: n2
-    image_definition: null
-    label: TACACS-SRV
-    node_definition: ubuntu
-    ram: null
-    tags: []
-    x: 320
-    y: -240
-    interfaces:
-      - id: i0
-        label: ens2
-        slot: 0
-        type: physical
-  - boot_disk_size: null
-    configuration: |-
-      hostname RT-1
-      no ip domain-lookup
-      ip domain-name lab.local
-      enable secret cisco123
-      username admin privilege 15 secret Admin123
-      !
-      aaa new-model
-      aaa authentication login TACACS_LOGIN group tacacs+ local
-      aaa authentication login CONSOLE none
-      !
-      tacacs server TACACS-SERVER
-       address ipv4 10.10.10.2
-       key demo
-       timeout 3
-      !
-      crypto key generate rsa general-keys modulus 2048
-      ip ssh version 2
-      ip ssh time-out 60
-      ip ssh authentication-retries 3
-      !
-      interface GigabitEthernet0/0
-       description TO-RT-EDGE
-       ip address 10.0.0.2 255.255.255.252
-       no shutdown
-      !
-      interface GigabitEthernet0/1
-       description TRUNK-TO-SW-1
-       no ip address
-       no shutdown
-      !
-      interface GigabitEthernet0/1.10
-       description VLAN10
-       encapsulation dot1Q 10
-       ip address 192.168.10.1 255.255.255.0
-      !
-      router ospf 1
-       router-id 2.2.2.2
-       passive-interface GigabitEthernet0/1.10
-       network 10.0.0.0 0.0.0.3 area 0
-       network 192.168.10.0 0.0.0.255 area 0
-      !
-      line con 0
-       login authentication CONSOLE
-       exec-timeout 0 0
-       logging synchronous
-      line vty 0 4
-       login authentication TACACS_LOGIN
-       transport input ssh
-       exec-timeout 5 0
-      !
-      end
-    cpu_limit: null
-    cpus: null
-    data_volume: null
-    hide_links: false
-    id: n3
-    image_definition: null
-    label: RT-1
-    node_definition: iosv
-    ram: null
-    tags: []
-    x: -480
-    y: -40
-    interfaces:
-      - id: i0
-        label: GigabitEthernet0/0
-        slot: 0
-        type: physical
-      - id: i1
-        label: GigabitEthernet0/1
-        slot: 1
-        type: physical
-  - boot_disk_size: null
-    configuration: |-
-      hostname RT-2
-      no ip domain-lookup
-      ip domain-name lab.local
-      enable secret cisco123
-      username admin privilege 15 secret Admin123
-      !
-      aaa new-model
-      aaa authentication login TACACS_LOGIN group tacacs+ local
-      aaa authentication login CONSOLE none
-      !
-      tacacs server TACACS-SERVER
-       address ipv4 10.10.10.2
-       key demo
-       timeout 3
-      !
-      crypto key generate rsa general-keys modulus 2048
-      ip ssh version 2
-      ip ssh time-out 60
-      ip ssh authentication-retries 3
-      !
-      interface GigabitEthernet0/0
-       description TO-RT-EDGE
-       ip address 10.0.0.6 255.255.255.252
-       no shutdown
-      !
-      interface GigabitEthernet0/1
-       description TRUNK-TO-SW-2
-       no ip address
-       no shutdown
-      !
-      interface GigabitEthernet0/1.20
-       description VLAN20
-       encapsulation dot1Q 20
-       ip address 192.168.20.1 255.255.255.0
-      !
-      router ospf 1
-       router-id 3.3.3.3
-       passive-interface GigabitEthernet0/1.20
-       network 10.0.0.4 0.0.0.3 area 0
-       network 192.168.20.0 0.0.0.255 area 0
-      !
-      line con 0
-       login authentication CONSOLE
-       exec-timeout 0 0
-       logging synchronous
-      line vty 0 4
-       login authentication TACACS_LOGIN
-       transport input ssh
-       exec-timeout 5 0
-      !
-      end
-    cpu_limit: null
-    cpus: null
-    data_volume: null
-    hide_links: false
-    id: n4
-    image_definition: null
-    label: RT-2
-    node_definition: iosv
-    ram: null
-    tags: []
-    x: -160
-    y: -40
-    interfaces:
-      - id: i0
-        label: GigabitEthernet0/0
-        slot: 0
-        type: physical
-      - id: i1
-        label: GigabitEthernet0/1
-        slot: 1
-        type: physical
-  - boot_disk_size: null
-    configuration: |-
-      hostname RT-3
-      no ip domain-lookup
-      ip domain-name lab.local
-      enable secret cisco123
-      username admin privilege 15 secret Admin123
-      !
-      aaa new-model
-      aaa authentication login TACACS_LOGIN group tacacs+ local
-      aaa authentication login CONSOLE none
-      !
-      tacacs server TACACS-SERVER
-       address ipv4 10.10.10.2
-       key demo
-       timeout 3
-      !
-      crypto key generate rsa general-keys modulus 2048
-      ip ssh version 2
-      ip ssh time-out 60
-      ip ssh authentication-retries 3
-      !
-      interface GigabitEthernet0/0
-       description TO-RT-EDGE
-       ip address 10.0.0.10 255.255.255.252
-       no shutdown
-      !
-      interface GigabitEthernet0/1
-       description TRUNK-TO-SW-3
-       no ip address
-       no shutdown
-      !
-      interface GigabitEthernet0/1.30
-       description VLAN30
-       encapsulation dot1Q 30
-       ip address 192.168.30.1 255.255.255.0
-      !
-      router ospf 1
-       router-id 4.4.4.4
-       passive-interface GigabitEthernet0/1.30
-       network 10.0.0.8 0.0.0.3 area 0
-       network 192.168.30.0 0.0.0.255 area 0
-      !
-      line con 0
-       login authentication CONSOLE
-       exec-timeout 0 0
-       logging synchronous
-      line vty 0 4
-       login authentication TACACS_LOGIN
-       transport input ssh
-       exec-timeout 5 0
-      !
-      end
-    cpu_limit: null
-    cpus: null
-    data_volume: null
-    hide_links: false
-    id: n5
-    image_definition: null
-    label: RT-3
-    node_definition: iosv
-    ram: null
-    tags: []
-    x: 160
-    y: -40
-    interfaces:
-      - id: i0
-        label: GigabitEthernet0/0
-        slot: 0
-        type: physical
-      - id: i1
-        label: GigabitEthernet0/1
-        slot: 1
-        type: physical
-  - boot_disk_size: null
-    configuration: |-
-      hostname RT-4
-      no ip domain-lookup
-      ip domain-name lab.local
-      enable secret cisco123
-      username admin privilege 15 secret Admin123
-      !
-      aaa new-model
-      aaa authentication login TACACS_LOGIN group tacacs+ local
-      aaa authentication login CONSOLE none
-      !
-      tacacs server TACACS-SERVER
-       address ipv4 10.10.10.2
-       key demo
-       timeout 3
-      !
-      crypto key generate rsa general-keys modulus 2048
-      ip ssh version 2
-      ip ssh time-out 60
-      ip ssh authentication-retries 3
-      !
-      interface GigabitEthernet0/0
-       description TO-RT-EDGE
-       ip address 10.0.0.14 255.255.255.252
-       no shutdown
-      !
-      interface GigabitEthernet0/1
-       description TRUNK-TO-SW-4
-       no ip address
-       no shutdown
-      !
-      interface GigabitEthernet0/1.40
-       description VLAN40
-       encapsulation dot1Q 40
-       ip address 192.168.40.1 255.255.255.0
-      !
-      router ospf 1
-       router-id 5.5.5.5
-       passive-interface GigabitEthernet0/1.40
-       network 10.0.0.12 0.0.0.3 area 0
-       network 192.168.40.0 0.0.0.255 area 0
-      !
-      line con 0
-       login authentication CONSOLE
-       exec-timeout 0 0
-       logging synchronous
-      line vty 0 4
-       login authentication TACACS_LOGIN
-       transport input ssh
-       exec-timeout 5 0
-      !
-      end
-    cpu_limit: null
-    cpus: null
-    data_volume: null
-    hide_links: false
-    id: n6
-    image_definition: null
-    label: RT-4
-    node_definition: iosv
-    ram: null
-    tags: []
-    x: 480
-    y: -40
-    interfaces:
-      - id: i0
-        label: GigabitEthernet0/0
-        slot: 0
-        type: physical
-      - id: i1
-        label: GigabitEthernet0/1
-        slot: 1
-        type: physical
-  - boot_disk_size: null
-    configuration: |-
-      hostname SW-1
-      no ip domain-lookup
-      ip domain-name lab.local
-      enable secret cisco123
-      username admin privilege 15 secret Admin123
-      !
-      aaa new-model
-      aaa authentication login TACACS_LOGIN group tacacs+ local
-      aaa authentication login CONSOLE none
-      !
-      tacacs server TACACS-SERVER
-       address ipv4 10.10.10.2
-       key demo
-       timeout 3
-      !
-      crypto key generate rsa general-keys modulus 2048
-      ip ssh version 2
-      ip ssh time-out 60
-      ip ssh authentication-retries 3
-      !
-      vlan 10
-       name VLAN10
-      !
-      interface GigabitEthernet0/0
-       description TRUNK-TO-RT-1
-       switchport trunk encapsulation dot1q
-       switchport mode trunk
-       switchport trunk allowed vlan 10
-       no shutdown
-      !
-      interface range GigabitEthernet0/1 - 3
-       switchport mode access
-       switchport access vlan 10
-       spanning-tree portfast
-       no shutdown
-      !
-      interface Vlan1
-       shutdown
-      !
-      interface Vlan10
-       ip address 192.168.10.2 255.255.255.0
-       no shutdown
-      !
-      no ip routing
-      ip default-gateway 192.168.10.1
-      !
-      line con 0
-       login authentication CONSOLE
-       exec-timeout 0 0
-       logging synchronous
-      line vty 0 15
-       login authentication TACACS_LOGIN
-       transport input ssh
-       exec-timeout 5 0
-      !
-      end
-    cpu_limit: null
-    cpus: null
-    data_volume: null
-    hide_links: false
-    id: n7
-    image_definition: null
-    label: SW-1
-    node_definition: iosvl2
-    ram: null
-    tags: []
-    x: -480
-    y: 160
-    interfaces:
-      - id: i0
-        label: GigabitEthernet0/0
-        slot: 0
-        type: physical
-      - id: i1
-        label: GigabitEthernet0/1
-        slot: 1
-        type: physical
-      - id: i2
-        label: GigabitEthernet0/2
-        slot: 2
-        type: physical
-      - id: i3
-        label: GigabitEthernet0/3
-        slot: 3
-        type: physical
-  - boot_disk_size: null
-    configuration: |-
-      hostname SW-2
-      no ip domain-lookup
-      ip domain-name lab.local
-      enable secret cisco123
-      username admin privilege 15 secret Admin123
-      !
-      aaa new-model
-      aaa authentication login TACACS_LOGIN group tacacs+ local
-      aaa authentication login CONSOLE none
-      !
-      tacacs server TACACS-SERVER
-       address ipv4 10.10.10.2
-       key demo
-       timeout 3
-      !
-      crypto key generate rsa general-keys modulus 2048
-      ip ssh version 2
-      ip ssh time-out 60
-      ip ssh authentication-retries 3
-      !
-      vlan 20
-       name VLAN20
-      !
-      interface GigabitEthernet0/0
-       description TRUNK-TO-RT-2
-       switchport trunk encapsulation dot1q
-       switchport mode trunk
-       switchport trunk allowed vlan 20
-       no shutdown
-      !
-      interface range GigabitEthernet0/1 - 3
-       switchport mode access
-       switchport access vlan 20
-       spanning-tree portfast
-       no shutdown
-      !
-      interface Vlan1
-       shutdown
-      !
-      interface Vlan20
-       ip address 192.168.20.2 255.255.255.0
-       no shutdown
-      !
-      no ip routing
-      ip default-gateway 192.168.20.1
-      !
-      line con 0
-       login authentication CONSOLE
-       exec-timeout 0 0
-       logging synchronous
-      line vty 0 15
-       login authentication TACACS_LOGIN
-       transport input ssh
-       exec-timeout 5 0
-      !
-      end
-    cpu_limit: null
-    cpus: null
-    data_volume: null
-    hide_links: false
-    id: n8
-    image_definition: null
-    label: SW-2
-    node_definition: iosvl2
-    ram: null
-    tags: []
-    x: -160
-    y: 160
-    interfaces:
-      - id: i0
-        label: GigabitEthernet0/0
-        slot: 0
-        type: physical
-      - id: i1
-        label: GigabitEthernet0/1
-        slot: 1
-        type: physical
-      - id: i2
-        label: GigabitEthernet0/2
-        slot: 2
-        type: physical
-      - id: i3
-        label: GigabitEthernet0/3
-        slot: 3
-        type: physical
-  - boot_disk_size: null
-    configuration: |-
-      hostname SW-3
-      no ip domain-lookup
-      ip domain-name lab.local
-      enable secret cisco123
-      username admin privilege 15 secret Admin123
-      !
-      aaa new-model
-      aaa authentication login TACACS_LOGIN group tacacs+ local
-      aaa authentication login CONSOLE none
-      !
-      tacacs server TACACS-SERVER
-       address ipv4 10.10.10.2
-       key demo
-       timeout 3
-      !
-      crypto key generate rsa general-keys modulus 2048
-      ip ssh version 2
-      ip ssh time-out 60
-      ip ssh authentication-retries 3
-      !
-      vlan 30
-       name VLAN30
-      !
-      interface GigabitEthernet0/0
-       description TRUNK-TO-RT-3
-       switchport trunk encapsulation dot1q
-       switchport mode trunk
-       switchport trunk allowed vlan 30
-       no shutdown
-      !
-      interface range GigabitEthernet0/1 - 3
-       switchport mode access
-       switchport access vlan 30
-       spanning-tree portfast
-       no shutdown
-      !
-      interface Vlan1
-       shutdown
-      !
-      interface Vlan30
-       ip address 192.168.30.2 255.255.255.0
-       no shutdown
-      !
-      no ip routing
-      ip default-gateway 192.168.30.1
-      !
-      line con 0
-       login authentication CONSOLE
-       exec-timeout 0 0
-       logging synchronous
-      line vty 0 15
-       login authentication TACACS_LOGIN
-       transport input ssh
-       exec-timeout 5 0
-      !
-      end
-    cpu_limit: null
-    cpus: null
-    data_volume: null
-    hide_links: false
-    id: n9
-    image_definition: null
-    label: SW-3
-    node_definition: iosvl2
-    ram: null
-    tags: []
-    x: 160
-    y: 160
-    interfaces:
-      - id: i0
-        label: GigabitEthernet0/0
-        slot: 0
-        type: physical
-      - id: i1
-        label: GigabitEthernet0/1
-        slot: 1
-        type: physical
-      - id: i2
-        label: GigabitEthernet0/2
-        slot: 2
-        type: physical
-      - id: i3
-        label: GigabitEthernet0/3
-        slot: 3
-        type: physical
-  - boot_disk_size: null
-    configuration: |-
-      hostname SW-4
-      no ip domain-lookup
-      ip domain-name lab.local
-      enable secret cisco123
-      username admin privilege 15 secret Admin123
-      !
-      aaa new-model
-      aaa authentication login TACACS_LOGIN group tacacs+ local
-      aaa authentication login CONSOLE none
-      !
-      tacacs server TACACS-SERVER
-       address ipv4 10.10.10.2
-       key demo
-       timeout 3
-      !
-      crypto key generate rsa general-keys modulus 2048
-      ip ssh version 2
-      ip ssh time-out 60
-      ip ssh authentication-retries 3
-      !
-      vlan 40
-       name VLAN40
-      !
-      interface GigabitEthernet0/0
-       description TRUNK-TO-RT-4
-       switchport trunk encapsulation dot1q
-       switchport mode trunk
-       switchport trunk allowed vlan 40
-       no shutdown
-      !
-      interface range GigabitEthernet0/1 - 3
-       switchport mode access
-       switchport access vlan 40
-       spanning-tree portfast
-       no shutdown
-      !
-      interface Vlan1
-       shutdown
-      !
-      interface Vlan40
-       ip address 192.168.40.2 255.255.255.0
-       no shutdown
-      !
-      no ip routing
-      ip default-gateway 192.168.40.1
-      !
-      line con 0
-       login authentication CONSOLE
-       exec-timeout 0 0
-       logging synchronous
-      line vty 0 15
-       login authentication TACACS_LOGIN
-       transport input ssh
-       exec-timeout 5 0
-      !
-      end
-    cpu_limit: null
-    cpus: null
-    data_volume: null
-    hide_links: false
-    id: n10
-    image_definition: null
-    label: SW-4
-    node_definition: iosvl2
-    ram: null
-    tags: []
-    x: 480
-    y: 160
-    interfaces:
-      - id: i0
-        label: GigabitEthernet0/0
-        slot: 0
-        type: physical
-      - id: i1
-        label: GigabitEthernet0/1
-        slot: 1
-        type: physical
-      - id: i2
-        label: GigabitEthernet0/2
-        slot: 2
-        type: physical
-      - id: i3
-        label: GigabitEthernet0/3
-        slot: 3
-        type: physical
-links:
-  - id: l0
-    n1: n0
-    n2: n1
-    i1: i0
-    i2: i0
-    label: INTERNET-port<->RT-EDGE-Gi0/0
-  - id: l1
-    n1: n1
-    n2: n3
-    i1: i1
-    i2: i0
-    label: RT-EDGE-Gi0/1<->RT-1-Gi0/0
-  - id: l2
-    n1: n1
-    n2: n4
-    i1: i2
-    i2: i0
-    label: RT-EDGE-Gi0/2<->RT-2-Gi0/0
-  - id: l3
-    n1: n1
-    n2: n5
-    i1: i3
-    i2: i0
-    label: RT-EDGE-Gi0/3<->RT-3-Gi0/0
-  - id: l4
-    n1: n1
-    n2: n6
-    i1: i4
-    i2: i0
-    label: RT-EDGE-Gi0/4<->RT-4-Gi0/0
-  - id: l5
-    n1: n1
-    n2: n2
-    i1: i5
-    i2: i0
-    label: RT-EDGE-Gi0/5<->TACACS-SRV-ens2
-  - id: l6
-    n1: n3
-    n2: n7
-    i1: i1
-    i2: i0
-    label: RT-1-Gi0/1<->SW-1-Gi0/0
-  - id: l7
-    n1: n4
-    n2: n8
-    i1: i1
-    i2: i0
-    label: RT-2-Gi0/1<->SW-2-Gi0/0
-  - id: l8
-    n1: n5
-    n2: n9
-    i1: i1
-    i2: i0
-    label: RT-3-Gi0/1<->SW-3-Gi0/0
-  - id: l9
-    n1: n6
-    n2: n10
-    i1: i1
-    i2: i0
-    label: RT-4-Gi0/1<->SW-4-Gi0/0
-lab:
-  description: RT-EDGE con NAT a Internet, 4 routers de acceso con router-on-a-stick, 4 switches con una VLAN cada uno, SSHv2 y AAA TACACS+ con fallback local.
-  notes: |-
-    Credenciales: admin / Admin123 | enable: cisco123 | Ubuntu: cisco / cisco
-    TACACS+: 10.10.10.2, key demo (instalar tac_plus-ng manualmente según la guía)
-    Mientras TACACS+ no esté operativo, SSH entra con el usuario local por fallback.
-  title: Lab SSH + TACACS+ (4 VLAN)
-  version: 0.2.2
+# 🔐 TACACS+ Server (tac_plus-ng) - Cisco IOS 15 Integration con SSH
+
+Autenticación centralizada RFC 8907 para routers Cisco usando tac_plus-ng en Ubuntu 24.04 LTS, con acceso remoto exclusivamente por SSHv2.
+
+![License](https://img.shields.io/badge/license-MIT%2FGPL-blue) ![Ubuntu](https://img.shields.io/badge/Ubuntu-24.04-orange) ![IOS](https://img.shields.io/badge/Cisco%20IOS-15.9-green) ![SSH](https://img.shields.io/badge/SSH-v2-black)
+
+---
+
+## 📋 Contenido
+
+- [Resumen](#-resumen)
+- [Requisitos](#️-requisitos)
+- [Instalación](#-instalación)
+- [Configuración](#️-configuración)
+- [Verificación](#️-verificación)
+- [Troubleshooting](#-troubleshooting)
+- [Limitaciones Conocidas](#️-limitaciones-conocidas)
+- [Lecciones Aprendidas](#-lecciones-aprendidas)
+- [Para Docentes](#-para-docentes)
+- [Referencias](#-referencias)
+
+---
+
+## 📖 Resumen
+
+Implementación de un servidor TACACS+ basado en **tac_plus-ng** (fork moderno y mantenido, compatible con RFC 8907) para autenticar por **SSHv2** a los usuarios de routers Cisco IOS 15.9.
+
+### ✨ Características Implementadas
+
+- ✅ Acceso remoto solo por SSHv2 (Telnet deshabilitado)
+- ✅ Autenticación centralizada contra servidor TACACS+ remoto
+- ✅ Fallback a usuario local si el servidor no responde
+- ✅ Acceso por consola sin autenticación (seguridad física)
+- ✅ Cifrado del payload TACACS+ con clave compartida
+- ✅ Compatible con RFC 8907
+- ✅ Compilación desde código fuente
+
+### ❌ No Implementado (Opcional)
+
+- Logging en archivo (la configuración está presente, pero tac_plus-ng no escribe logs)
+- Enable con TACACS+
+- Backend LDAP/Active Directory
+- TLS 1.3 (RFC 9887)
+- MFA
+
+---
+
+## 🖥️ Requisitos
+
+### Hardware
+
+- **Servidor Ubuntu:** 1 vCPU, 512 MB RAM, 2 GB disco (mínimo)
+- **Router Cisco:** IOS 15.x o superior, con imagen que soporte crypto (k9)
+- **Red:** conectividad L3 entre ambos (TCP 49 para TACACS+, TCP 22 para SSH)
+
+### Software
+
+- **Ubuntu:** 24.04 LTS o similar Debian-based
+- **Cisco IOS:** 15.9 (probado)
+- **Cliente SSH:** OpenSSH (incluido en Ubuntu)
+
+### Librerías de compilación
+
+```
+build-essential libssl-dev libpam0g-dev libpcre2-dev libcurl4-openssl-dev
+libldap2-dev libradcli-dev zlib1g-dev libc-ares-dev
+```
+
+---
+
+## 📦 Instalación
+
+### 1️⃣ Preparar Ubuntu
+
+#### ⚠️ 1.1 Configurar DNS (obligatorio, primer paso)
+
+Sin DNS, `apt` y `git` fallan.
+
+```bash
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+echo "nameserver 1.1.1.1" >> /etc/resolv.conf
+cat /etc/resolv.conf
+```
+
+> 💡 En CML y VirtualBox, `systemd-resolved` puede quedar apuntando solo a `127.0.0.53` sin servidores reales.
+> Síntoma: `Temporary failure resolving 'archive.ubuntu.com'`
+
+#### 1.2 Instalar dependencias
+
+```bash
+apt update
+apt install -y build-essential libssl-dev libpam0g-dev git perl \
+              libpcre2-dev libcurl4-openssl-dev libldap2-dev \
+              libradcli-dev zlib1g-dev libc-ares-dev
+```
+
+#### 1.3 Descargar y compilar
+
+```bash
+cd /tmp
+git clone https://github.com/MarcJHuber/event-driven-servers.git
+cd event-driven-servers
+./configure --minimum
+make
+make install
+```
+
+#### 1.4 Verificar instalación
+
+```bash
+which tac_plus-ng
+# /usr/local/sbin/tac_plus-ng
+
+tac_plus-ng -v
+# tac_plus-ng version fd4818b7.../PCRE2
+```
+
+### 2️⃣ Crear estructura de directorios
+
+```bash
+mkdir -p /etc/tac_plus-ng
+mkdir -p /var/log/tac_plus-ng
+chmod 777 /var/log/tac_plus-ng
+touch /var/log/tac_plus-ng/tac_plus.log
+chmod 666 /var/log/tac_plus-ng/tac_plus.log
+```
+
+---
+
+## ⚙️ Configuración
+
+### 🔑 Nota Crítica: Clave Compartida
+
+- TACACS+ cifra el payload completo (usuario, contraseña, comandos) con la clave.
+- La clave debe ser **idéntica** en el servidor y en el router.
+- Si no coinciden, la autenticación falla sin mensajes útiles.
+
+```bash
+# Ubuntu
+grep "key = " /etc/tac_plus-ng/tac_plus-ng.cfg
+```
+```
+! Router
+show run | section tacacs
+```
+
+---
+
+### 1️⃣ Servidor TACACS+ (Ubuntu)
+
+**Archivo:** `/etc/tac_plus-ng/tac_plus-ng.cfg`
+
+```
+id = spawnd {
+    background = no
+    listen { port = 49 }
+}
+
+id = tac_plus-ng {
+    log = "/var/log/tac_plus-ng/tac_plus.log"
+
+    host world {
+        address = 0.0.0.0/0
+        key = demo
+    }
+
+    profile admin {
+        script {
+            if (service == shell) {
+                permit
+            }
+        }
+    }
+
+    user test {
+        password login = clear testpass
+        password pap = login
+        profile = admin
+    }
+}
+```
+
+> ⚠️ El ejemplo de tac_plus-ng usa el puerto 4949. El estándar IANA para TACACS+ es **TCP 49**, que es lo que Cisco espera por defecto.
+
+#### Iniciar servidor
+
+```bash
+tac_plus-ng -f /etc/tac_plus-ng/tac_plus-ng.cfg &
+```
+
+#### Verificar puerto
+
+```bash
+ss -tuln | grep 49
+# tcp   LISTEN 0   128   *:49   *:*
+```
+
+---
+
+### 2️⃣ Router Cisco (IOS 15) — Paso a Paso
+
+#### 2.1 Conectividad previa
+
+```
+ping 10.10.10.2
+! !!!!! (5/5 100%)
+```
+
+#### 2.2 Identidad del equipo y enable
+
+```
+configure terminal
+ hostname RT-1
+ ip domain-name lab.local
+ enable secret cisco123
+```
+
+| Comando | Función |
+|---|---|
+| `hostname RT-1` | Cambia el nombre por defecto. Es obligatorio para generar las claves RSA. |
+| `ip domain-name lab.local` | Dominio usado para nombrar las claves RSA. |
+| `enable secret cisco123` | Contraseña de modo privilegiado, almacenada como hash. |
+
+#### 2.3 Usuario local de respaldo
+
+```
+ username admin privilege 15 secret Admin123
+```
+
+> ⚠️ El método `local` del fallback usa **esta** base de usuarios, no el `enable secret`. Sin un usuario local, si TACACS+ cae, nadie puede entrar por SSH.
+
+#### 2.4 Claves RSA y SSHv2
+
+```
+ crypto key generate rsa general-keys modulus 2048
+ ip ssh version 2
+ ip ssh time-out 60
+ ip ssh authentication-retries 3
+```
+
+| Comando | Función |
+|---|---|
+| `crypto key generate rsa ... modulus 2048` | Genera las claves del servidor SSH. SSHv2 requiere 768 bits como mínimo. |
+| `ip ssh version 2` | Desactiva SSHv1. Debe ir después de generar las claves. |
+| `ip ssh time-out 60` | Tiempo máximo (en segundos) para autenticarse. |
+| `ip ssh authentication-retries 3` | Intentos permitidos por conexión. |
+
+#### 2.5 AAA y servidor TACACS+
+
+```
+ aaa new-model
+ aaa authentication login TACACS_LOGIN group tacacs+ local
+ !
+ tacacs server TACACS-SERVER
+  address ipv4 10.10.10.2
+  key demo
+ exit
+```
+
+| Comando | Función |
+|---|---|
+| `aaa new-model` | Activa el framework AAA. |
+| `aaa authentication login TACACS_LOGIN group tacacs+ local` | Lista de métodos: primero TACACS+ y, si no responde, usuarios locales. |
+| `tacacs server` | Define la IP y la clave del servidor. |
+
+#### 2.6 Líneas VTY solo SSH
+
+```
+ line vty 0 4
+  login authentication TACACS_LOGIN
+  transport input ssh
+  exec-timeout 5 0
+ exit
+```
+
+#### 2.7 Consola
+
+```
+ line con 0
+  no login
+ exit
+end
+write memory
+```
+
+> ⚠️ `no login` en consola es el acceso de emergencia si TACACS+ o la red fallan. Su protección es física (sala y rack con llave), no AAA.
+
+#### 2.8 Configuración completa
+
+```
+configure terminal
+ hostname RT-1
+ ip domain-name lab.local
+ enable secret cisco123
+ username admin privilege 15 secret Admin123
+ crypto key generate rsa general-keys modulus 2048
+ ip ssh version 2
+ ip ssh time-out 60
+ ip ssh authentication-retries 3
+ !
+ aaa new-model
+ aaa authentication login TACACS_LOGIN group tacacs+ local
+ !
+ tacacs server TACACS-SERVER
+  address ipv4 10.10.10.2
+  key demo
+ exit
+ !
+ line vty 0 4
+  login authentication TACACS_LOGIN
+  transport input ssh
+  exec-timeout 5 0
+ exit
+ !
+ line con 0
+  no login
+ exit
+end
+write memory
+```
+
+---
+
+## ✔️ Verificación
+
+### 1️⃣ Ubuntu — Servidor activo
+
+```bash
+ps aux | grep tac_plus-ng
+ss -tuln | grep 49
+```
+
+### 2️⃣ Router — SSH y AAA
+
+```
+show ip ssh
+! SSH Enabled - version 2.0
+
+show run | include aaa
+! aaa new-model
+! aaa authentication login TACACS_LOGIN group tacacs+ local
+
+show run | section tacacs
+! tacacs server TACACS-SERVER
+!  address ipv4 10.10.10.2
+!  key demo
+
+show run | section line vty
+! login authentication TACACS_LOGIN
+! transport input ssh
+
+show tacacs
+! Muestra conexiones, paquetes enviados/recibidos y estado del servidor
+```
+
+### 3️⃣ Prueba funcional — Login SSH con TACACS+
+
+Desde Ubuntu u otra máquina:
+
+```bash
+ssh test@10.10.10.1
+# Password: testpass
+# RT-1>
+```
+
+> ⚠️ Si OpenSSH rechaza la conexión por algoritmos, revise [Troubleshooting](#-no-matching-key-exchange--host-key-type-ssh).
+
+### 4️⃣ Prueba funcional — Enable
+
+```
+RT-1>enable
+Password: cisco123
+RT-1#
+```
+
+### 5️⃣ Prueba de fallback local
+
+```bash
+# Ubuntu: detener TACACS+
+killall tac_plus-ng
+```
+```bash
+ssh admin@10.10.10.1
+# Password: Admin123  → acceso con usuario local
+```
+
+### 6️⃣ Confirmar que Telnet está bloqueado
+
+```bash
+telnet 10.10.10.1
+# Connection refused / cierre inmediato
+```
+
+---
+
+## 🔧 Troubleshooting
+
+### ❌ "no matching key exchange / host key type" (SSH)
+
+**Síntoma:**
+
+```
+Unable to negotiate with 10.10.10.1 port 22: no matching key exchange method found.
+Their offer: diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1
+```
+
+**Causa:** OpenSSH 9.x (Ubuntu 24.04) deshabilita por defecto los algoritmos SHA-1 que usa IOS 15.9.
+
+**Solución (por conexión):**
+
+```bash
+ssh -o KexAlgorithms=+diffie-hellman-group14-sha1 \
+    -o HostKeyAlgorithms=+ssh-rsa \
+    -o PubkeyAcceptedAlgorithms=+ssh-rsa \
+    test@10.10.10.1
+```
+
+**Solución (permanente, solo para el lab):** `~/.ssh/config`
+
+```
+Host 10.10.10.1
+    KexAlgorithms +diffie-hellman-group14-sha1
+    HostKeyAlgorithms +ssh-rsa
+    PubkeyAcceptedAlgorithms +ssh-rsa
+```
+
+> 💡 Es una excepción para equipos legacy. No debe aplicarse globalmente.
+
+---
+
+### ❌ "Connection refused" en puerto 22
+
+**Causa:** SSH no está habilitado en el router.
+
+```
+show ip ssh
+```
+
+| Salida | Causa | Solución |
+|---|---|---|
+| `SSH Disabled` | No hay claves RSA | `crypto key generate rsa general-keys modulus 2048` |
+| `version 1.99` | Falta forzar v2 | `ip ssh version 2` |
+| `ip ssh version 2` da error | Claves de 512 bits | Regenerar con `modulus 2048` |
+| `Please define a hostname other than Router` | Hostname por defecto | `hostname RT-1` |
+
+También verifique que `line vty` tenga `transport input ssh`.
+
+---
+
+### ❌ "Authentication failed" (caso más común)
+
+**Causa raíz (90 %):** la clave compartida es distinta en el router y en el servidor.
+
+```bash
+# Ubuntu
+grep "key = " /etc/tac_plus-ng/tac_plus-ng.cfg
+```
+```
+! Router
+show run | section tacacs
+```
+
+**Sincronizar (opción router):**
+
+```
+configure terminal
+ tacacs server TACACS-SERVER
+  key demo
+end
+```
+
+**Sincronizar (opción Ubuntu):**
+
+```bash
+sed -i 's/key = cisco/key = demo/g' /etc/tac_plus-ng/tac_plus-ng.cfg
+killall tac_plus-ng
+tac_plus-ng -f /etc/tac_plus-ng/tac_plus-ng.cfg &
+```
+
+---
+
+### ❌ Usuario TACACS+ rechazado, pero el usuario local funciona
+
+**Causa:** TACACS+ no responde y el router está usando el fallback local.
+
+```
+! Router
+ping 10.10.10.2
+show tacacs
+```
+```bash
+# Ubuntu
+ps aux | grep tac_plus-ng
+ss -tuln | grep 49
+grep "user test" /etc/tac_plus-ng/tac_plus-ng.cfg
+```
+
+---
+
+### ❌ Usuario "test" no existe
+
+```bash
+cat >> /etc/tac_plus-ng/tac_plus-ng.cfg << 'EOF'
+
+    user test {
+        password login = clear testpass
+        password pap = login
+        profile = admin
+    }
+EOF
+killall tac_plus-ng
+tac_plus-ng -f /etc/tac_plus-ng/tac_plus-ng.cfg &
+```
+
+> ⚠️ El bloque `user` debe quedar **dentro** de `id = tac_plus-ng { ... }`. Si se agrega con `>>` al final del archivo, queda fuera. Edite con `nano` si es necesario.
+
+---
+
+### ⚠️ Contraseña correcta, pero falla
+
+**Causa:** caracteres especiales (`@`, `#`, `!`) en la contraseña del servidor.
+
+```
+# ❌ password login = clear Pass@123
+# ✅ password login = clear Passw0rd123
+```
+
+---
+
+### ❌ Consola del router bloqueada
+
+**Causa:** consola con autenticación AAA y sin usuario local.
+
+```
+# CML: Right-click → Stop → Wipe → Start
+line con 0
+ no login
+```
+
+---
+
+## ⚠️ Limitaciones Conocidas
+
+1. **Enable no autentica con TACACS+** en este lab. Workaround: `enable secret` local.
+2. **Logs no se escriben en archivo.** Workaround: modo debug.
+   ```bash
+   tac_plus-ng -f /etc/tac_plus-ng/tac_plus-ng.cfg -d 8
+   ```
+3. **Caracteres especiales en passwords:** use solo `a-z A-Z 0-9 _ -`.
+4. **Usuario `nobody:nobody`** no existe en algunos Ubuntu. Workaround: `chmod 777` en el directorio de logs.
+5. **Algoritmos SSH legacy** en IOS 15.9: requieren habilitar SHA-1 en el cliente OpenSSH.
+
+---
+
+## 🔀 Comparación: TACACS+ vs Alternativas
+
+| Aspecto | TACACS+ | RADIUS | SSH Keys locales |
+|---|---|---|---|
+| Protocolo | RFC 8907, TCP 49 | RFC 2865, UDP 1812/1813 | SSH |
+| Cifrado | Payload completo | Solo el password | Asimétrico |
+| Separación AAA | Authn / Authz / Acct separados | Authn + Authz combinados | Solo authn |
+| Accounting por comando | ✅ | Básico | ❌ |
+| Uso típico | Administración de equipos | VPN, WiFi, 802.1X | Pocos equipos |
+
+**Regla:** TACACS+ para administración de equipos de red; RADIUS para acceso de usuarios a la red.
+
+---
+
+## 🎓 Flujo de Autenticación SSH + TACACS+
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 1. USUARIO ABRE SESIÓN SSH                                  │
+│    $ ssh test@10.10.10.1                                    │
+└────────────────┬────────────────────────────────────────────┘
+                 ↓
+┌─────────────────────────────────────────────────────────────┐
+│ 2. NEGOCIACIÓN SSHv2 (TCP 22)                               │
+│    - Intercambio de claves (Diffie-Hellman)                 │
+│    - Router presenta su clave RSA de host                   │
+│    - Se establece el túnel cifrado cliente ↔ router         │
+└────────────────┬────────────────────────────────────────────┘
+                 ↓
+┌─────────────────────────────────────────────────────────────┐
+│ 3. USUARIO ENVÍA CREDENCIALES DENTRO DEL TÚNEL SSH          │
+│    test / testpass                                          │
+└────────────────┬────────────────────────────────────────────┘
+                 ↓
+┌─────────────────────────────────────────────────────────────┐
+│ 4. ROUTER APLICA LISTA TACACS_LOGIN                         │
+│    Método 1: group tacacs+                                  │
+└────────────────┬────────────────────────────────────────────┘
+                 ↓
+┌─────────────────────────────────────────────────────────────┐
+│ 5. ROUTER → SERVIDOR (TCP 49)                               │
+│    Payload TACACS+ cifrado con clave "demo"                 │
+└────────────────┬────────────────────────────────────────────┘
+                 ↓
+┌─────────────────────────────────────────────────────────────┐
+│ 6. SERVIDOR DESCIFRA Y VALIDA                               │
+│    ✓ Clave coincide → busca usuario → compara password      │
+│    ✗ Clave no coincide → datos ilegibles → falla            │
+└────────────────┬────────────────────────────────────────────┘
+                 ↓
+┌─────────────────────────────────────────────────────────────┐
+│ 7. RESPUESTA EN LA MISMA SESIÓN TCP 49                      │
+│    PASS o FAIL (cifrado con la misma clave)                 │
+└────────────────┬────────────────────────────────────────────┘
+                 ↓
+┌─────────────────────────────────────────────────────────────┐
+│ 8. RESULTADO EN EL ROUTER                                   │
+│    ✓ PASS    → RT-1>                                        │
+│    ✗ FAIL    → "Authentication failed" (sin fallback)       │
+│    ✗ TIMEOUT → Método 2: local (username admin)             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Puntos críticos
+
+- **Dos capas de cifrado:** SSH protege el tramo usuario ↔ router; la clave TACACS+ protege el tramo router ↔ servidor.
+- **El fallback local solo actúa si el servidor no responde.** Un FAIL explícito no pasa al método local.
+- **TACACS+ no informa la causa del rechazo.** No dice "usuario no existe" ni "password incorrecto", para no revelar usuarios válidos.
+
+### Estrategia de debugging
+
+```
+Si falla el login:
+  1. ¿SSH responde?         → show ip ssh / ssh -v
+  2. ¿Clave idéntica?       → comparar ambos lados
+  3. ¿Usuario existe?       → grep "user" en la config
+  4. ¿Servidor responde?    → ping + ps aux + ss -tuln + show tacacs
+  5. ¿Caracteres especiales? → usar solo alfanuméricos
+```
+
+---
+
+## 📚 Lecciones Aprendidas
+
+1. **DNS primero:** sin DNS no hay `apt` ni `git`.
+2. **Clave compartida idéntica:** es la causa de la mayoría de las fallas.
+3. **IOS 15 soporta TACACS+:** debuggee la configuración antes de culpar a la versión.
+4. **La consola es el último recurso:** `no login` más protección física.
+5. **Puerto 49:** es el estándar IANA. El 4949 del ejemplo no lo es.
+6. **El fallback local requiere un usuario local:** `enable secret` no reemplaza a `username`.
+7. **IOS legacy vs OpenSSH moderno:** los algoritmos SHA-1 deben habilitarse explícitamente en el cliente.
+8. **Los logs de tac_plus-ng son escasos:** use `-d 8` y debuggee por capas.
+
+---
+
+## 👨‍🎓 Para Docentes
+
+### Objetivos de Aprendizaje
+
+- ✅ Compilar e instalar tac_plus-ng desde código fuente
+- ✅ Configurar SSHv2 en Cisco IOS
+- ✅ Implementar AAA con TACACS+ y fallback local
+- ✅ Debuggear autenticación centralizada por capas
+- ✅ Diferenciar TACACS+, RADIUS y claves SSH
+
+### 🟢 Nivel Básico
+
+**Verificar instalación y SSH**
+
+```bash
+which tac_plus-ng && tac_plus-ng -v
+ss -tuln | grep 49
+```
+```
+show ip ssh
+```
+
+**Agregar usuario `alice`** (dentro del bloque `tac_plus-ng`):
+
+```
+user alice {
+    password login = clear Alice123
+    password pap = login
+    profile = admin
+}
+```
+
+Reinicie el servidor y pruebe con `ssh alice@10.10.10.1`.
+
+**Cambiar enable secret**
+
+```
+configure terminal
+ enable secret NewPassword123
+end
+write memory
+```
+
+### 🟡 Nivel Intermedio
+
+**Cambiar la clave compartida en ambos lados**
+
+```bash
+sed -i 's/key = demo/key = mycluster123/g' /etc/tac_plus-ng/tac_plus-ng.cfg
+killall tac_plus-ng
+tac_plus-ng -f /etc/tac_plus-ng/tac_plus-ng.cfg &
+```
+```
+configure terminal
+ tacacs server TACACS-SERVER
+  key mycluster123
+end
+write memory
+```
+
+**Simular caída de TACACS+ y observar el fallback**
+
+```bash
+killall tac_plus-ng
+ssh admin@10.10.10.1   # debe entrar con usuario local
+ssh test@10.10.10.1    # debe fallar
+```
+
+**Clave incorrecta deliberada:** cambie la clave solo en Ubuntu, intente el login con `test` y pida al alumno que encuentre la causa.
+
+**Verificar que Telnet está bloqueado:** `telnet 10.10.10.1` debe fallar. Explicar por qué.
+
+### 🔴 Nivel Avanzado
+
+**Diagnóstico sin logs.** Entregue escenarios rotos:
+
+1. Clave distinta
+2. Servidor detenido
+3. Usuario inexistente
+4. Password con `@`
+5. Router sin claves RSA
+6. VTY con `transport input telnet`
+
+Herramientas permitidas: `ping`, `grep`, `ss`, `show ip ssh`, `show tacacs`, `ssh -v`.
+
+**Captura de tráfico.** Capture con Wireshark los tramos TCP 22 y TCP 49. ¿Qué se ve en cada uno? ¿Qué cambiaría con Telnet?
+
+**Diseño a producción:**
+
+- 3 routers y 1 servidor TACACS+ (¿y redundancia?)
+- Perfiles: admin, operator, tech-support
+- ¿Cómo se maneja la caída del servidor?
+- ¿Cómo se rotan claves y contraseñas?
+
+---
+
+## ✅ Checklist de Verificación
+
+### Servidor Ubuntu
+
+- [ ] DNS configurado: `grep nameserver /etc/resolv.conf`
+- [ ] tac_plus-ng instalado: `which tac_plus-ng && tac_plus-ng -v`
+- [ ] Proceso corriendo: `ps aux | grep tac_plus-ng`
+- [ ] Puerto 49 escuchando: `ss -tuln | grep 49`
+- [ ] Usuario definido: `grep "user test" /etc/tac_plus-ng/tac_plus-ng.cfg`
+- [ ] Clave configurada: `grep "key = " /etc/tac_plus-ng/tac_plus-ng.cfg`
+
+### Router Cisco
+
+- [ ] Ping al servidor: `ping 10.10.10.2`
+- [ ] Hostname y dominio: `show run | include hostname|domain`
+- [ ] SSH v2 activo: `show ip ssh` → `version 2.0`
+- [ ] Usuario local de respaldo: `show run | include username`
+- [ ] AAA habilitado: `show run | include aaa`
+- [ ] Servidor TACACS+: `show run | section tacacs`
+- [ ] VTY solo SSH: `show run | section line vty`
+- [ ] Consola sin login AAA: `show run | section line con`
+
+### Prueba Funcional
+
+- [ ] `ssh test@10.10.10.1` → `RT-1>`
+- [ ] `enable` → `RT-1#`
+- [ ] Fallback: con el servidor detenido, `ssh admin@10.10.10.1` funciona
+- [ ] `telnet 10.10.10.1` es rechazado
+
+---
+
+## 📋 Especificaciones de Lab
+
+| Componente | Valor |
+|---|---|
+| Ubuntu | 24.04.4 LTS, kernel 6.8, x86_64 |
+| Router | Cisco IOSv 15.9 |
+| Plataforma | CML 2.0 |
+| Ubuntu IP | 10.10.10.2/24 |
+| Router IP | 10.10.10.1/24 |
+| TACACS+ | TCP 49 |
+| SSH | TCP 22, v2 |
+| Shared key | `demo` |
+| Usuario TACACS+ | `test` / `testpass` |
+| Usuario local | `admin` / `Admin123` |
+| Enable secret | `cisco123` |
+
+---
+
+## 📖 Referencias
+
+| Documento | Enlace |
+|---|---|
+| RFC 8907 (TACACS+) | https://www.rfc-editor.org/rfc/rfc8907 |
+| RFC 9887 (TACACS+ sobre TLS 1.3) | https://www.rfc-editor.org/rfc/rfc9887 |
+| RFC 4253 (SSH Transport) | https://www.rfc-editor.org/rfc/rfc4253 |
+| tac_plus-ng | https://github.com/MarcJHuber/event-driven-servers |
+| Cisco AAA | https://www.cisco.com/c/en/us/support/docs/security/ios-aaa/ |
+| IANA Ports | https://www.iana.org/assignments/service-names-port-numbers/ |
+
+---
+
+## 📄 Licencia
+
+Este proyecto utiliza software bajo licencias MIT y GPL. Ver `LICENSE`.
+
+## ✍️ Autor
+
+**Daniel "pulentoski" Soto**
+🏢 Docente — INACAP La Serena | Área de Informática, Ciberseguridad y Telecomunicaciones
+💼 Co-founder — EscudoNorte (Cybersecurity & Compliance Consultancy)
+📍 Región de Coquimbo, Chile
